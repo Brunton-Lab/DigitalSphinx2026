@@ -1,0 +1,83 @@
+name: fly_imitation
+env_name: fly_imitation_walk
+version: walk
+camera: 1
+clip_idx: FruitflyV1_walk_500hz_avg.h5
+train: True
+
+##### Environment Params #####
+env_args:
+  clip_length: 1001
+  start_frame_range: [0, 50]
+  mujoco_impl: null
+  floor_height: -0.125
+  enable_flight: False
+  quasi_aero: True
+  physics_timestep: 2e-4
+  solver: cg
+  iterations: 4
+  ls_iterations: 4
+  noslip_iterations: 3
+  nconmax: 256
+  njmax: 512
+  torque_actuators: True
+  only_T1: false
+  physics_steps_per_control_step: 5
+  mocap_hz: 500
+  test_ratio: 0.4
+  reward_terms:
+    root_pos:
+      weight: 1.0
+      exp_scale: 400.0
+    root_quat:
+      weight: 1.0
+      exp_scale: 4.0
+    root_ang_vel:
+      weight: 0.0
+      exp_scale: 0.075
+    joints:
+      weight: 1.0
+      exp_scale: 0.25
+    joints_vel:
+      weight: 0.0
+      exp_scale: 0.001
+    bodies_pos:
+      weight: 0.0
+      exp_scale: 8.0
+    end_eff:
+      weight: 1.0
+      exp_scale: 100.0
+    thorax_z_range:
+      weight: 0.0
+      healthy_z_range: [-0.03, 0.1]
+    last_frame_reward:
+      weight: 10.0
+    control_cost:
+      weight: 0.02
+    control_diff_cost:
+      weight: 0.1
+    energy_cost:
+      max_value: 50.0
+      weight: 0.001
+  termination_criteria:
+    root_too_far:
+      max_distance: 0.01
+    root_too_rotated:
+      max_degrees: 0.075
+    pose_error:
+      max_l2_error: 5.0
+    thorax_z_range:
+      enable_flight: False
+      healthy_z_range: [-0.03, 0.04]
+    nan_state:
+      unused: True
+  reset_noise_scale: 1e-3
+  ref_len: 5
+  partial_ref_traj: False
+  mask_prob: 0.2
+  retract_wings: True
+  qvel_init: 'noise'
+
+  # Anatomical lists (end_eff_names, body_names, joint_names, wing_names)
+  # are now loaded from configs/anatomy/{v1|v2}.yaml
+  # To switch anatomy version: python main_refactor.py anatomy=v1 dataset=imitation_walk

@@ -1,0 +1,33 @@
+name: fly_tracking
+channels:
+  - conda-forge
+  - anaconda
+  - menpo
+dependencies:
+  - python=3.11
+  - numpy
+  - matplotlib
+  - pandas
+  - pip
+  - black
+  - glew
+  - mesalib
+  - mesa-libgl-cos6-x86_64
+  - glfw3
+  - ipykernel
+  - ffmpeg
+  - pip
+  - pip:
+      - "--editable=."
+      - hydra-core
+      - jax[cuda12]
+      - h5py
+      - natsort
+      - nvidia-ml-py3
+      - tqdm
+      - psutil
+      - mediapy
+      - imageio[ffmpeg]
+variables:             # Set MuJoCo environment variables
+  MUJOCO_GL: egl
+  PYOPENGL_PLATFORM: egl

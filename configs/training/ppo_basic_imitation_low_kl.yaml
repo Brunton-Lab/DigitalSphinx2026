@@ -1,0 +1,27 @@
+# @package _global_
+# PPO Training for Basic Imitation Learning
+# Learns direct actuator control to match reference behaviors (no VNC/closed-loop)
+#
+# Usage: python scripts/train_basic_imitation.py training=ppo_basic_imitation dataset=imitation_walk
+
+defaults:
+  - ppo_base
+  - _self_
+
+# Override task name to match environment
+train_setup:
+  task_name: ${dataset.env_name}
+  wandb_project: "celegans_kl_cl_off"
+
+
+
+# Optional: Adjust hyperparameters for direct control
+train_args:
+  kl_weight: 0.001
+  # num_envs: 128  # Can use more envs since no VNC overhead
+#   learning_rate: 3e-4
+#   entropy_cost: 1e-2
+
+# Note: This config uses direct actuator control (not closed-loop VNC)
+# Action space: Joint torque commands (18-90 actuators depending on anatomy)
+# For closed-loop training, use: python scripts/train_closed_loop.py training=ppo_imitation

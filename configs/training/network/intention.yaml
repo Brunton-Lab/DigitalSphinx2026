@@ -1,0 +1,16 @@
+# Intention network configuration (encoder-decoder with latent)
+network_type: intention
+init_checkpoint_network_type: intention
+network_factory_args:
+  encoder_hidden_layer_sizes: [512, 512]
+  decoder_hidden_layer_sizes: [512, 512]
+  value_hidden_layer_sizes: [512, 512, 256, 256]
+  intention_latent_size: 16
+ckpt_net:
+  encoder_hidden_layer_sizes: [512, 512]
+  decoder_hidden_layer_sizes: [512, 512]
+  value_hidden_layer_sizes: [512, 512, 256, 256]
+  intention_latent_size: 16
+restore_checkpoint: ''
+freeze_decoder: false
+fine_tune: false

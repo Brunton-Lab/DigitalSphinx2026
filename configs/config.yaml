@@ -1,0 +1,50 @@
+# Top-level configuration for fly neuromechanics
+# Core configuration for closed-loop neuromechanical simulation
+#
+# Usage:
+#   Simulation: python scripts/run_simulation.py
+#   RL Training: python scripts/train_closed_loop.py training=ppo_imitation
+#   Override anatomy: python script.py anatomy=v1
+#   Override dataset: python script.py dataset=imitation_flight
+# /gscratch/portia/jqhu/work/neuromech/c_elegans/fly_neuromech/fruitfly_body_models/fruitfly_v1/fruitfly_v1_free.xml
+
+defaults:
+  - _self_
+  - training: ppo_basic_imitation_low_kl
+  # - training/anatomy: v2_fast_simple      # Anatomical model with all legs (T1/T2/T3), no abdomen
+  - training/anatomy: v1      # Anatomical model with all legs (T1/T2/T3), no abdomen
+  - connectome: C_elegans_VRNN
+  - paths: JH_hyak
+  # - dataset: imitation_walk
+  - dataset: imitation_walk_anipose_data_v1
+
+# Run identification
+run_id: 'freewalk_celegans'
+version: 'walk'
+seed: 0
+note: 'freewalk_celegans'
+load_jobid: ''
+
+# Hydra configuration
+hydra:
+  job:
+      config:
+        override_dirname:
+          exclude_keys:
+            - paths
+            - anatomy
+            - note
+            - run_id
+            - seed
+            - version
+            - training
+            - muscles
+            - sensors
+            - physics
+            - integration
+            - vnc_sim
+  run:
+    dir: ${paths.base_dir}/${run_id}
+  sweep:
+    dir: ${paths.base_dir}/${run_id}
+    subdir: ${hydra.job.override_dirname}

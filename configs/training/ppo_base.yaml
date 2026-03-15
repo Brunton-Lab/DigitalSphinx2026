@@ -1,0 +1,49 @@
+# @package _global_
+# Base PPO Training Configuration
+# Shared settings for all PPO training runs
+
+defaults:
+  - /training/network: intention  # Default network architecture
+
+# Training metadata
+train_setup:
+  wandb_project: "fly_neuromechanics"
+  algo_name: ppo
+  num_timesteps: 10_000_000_000
+  eval_every: 50_000_000
+  reset_every: 50_000_000
+  mb_per_env: 21.4
+
+# PPO algorithm parameters
+train_args:
+  seed: ${seed}
+  num_envs: 2048
+  batch_size: 512
+  reward_scaling: 1
+  normalize_observations: true
+  action_repeat: 1
+  clipping_epsilon: 0.2
+  unroll_length: 20
+  num_minibatches: 32
+  num_updates_per_batch: 8
+  discounting: 0.95
+  entropy_cost: 1e-2
+  learning_rate: 1e-4
+  max_grad_norm: 1.0
+  
+  # Distribution matching losses
+  kl_weight: 0.1
+  mmd_weight: 1.0
+  kl_loss: true
+  mmd_loss: false
+  kl_ramp: 1.25
+  kl_ramp_cycles: 3
+  warmup_steps: 0
+  use_kl_schedule: false
+  use_mmd_schedule: false
+
+# Network architecture - defined in network/*.yaml configs
+
+# Checkpointing
+load_checkpoint: ''
+restore_checkpoint: ''

@@ -1,0 +1,21 @@
+# Unified paths configuration
+user: eabe
+
+# Base directories
+project_dir: "/gscratch/portia/${paths.user}/Research/MyRepos/fly_neuromech"
+base_dir: "/gscratch/portia/${paths.user}/fly_neuromech/${version}"
+save_dir: ${multirun_save_dir:${paths.base_dir},${run_id}}
+log_dir:  "${paths.save_dir}/logs/"
+ckpt_dir: "${paths.save_dir}/ckpt/"
+fig_dir:  "${paths.save_dir}/figures/"
+data_dir: "/gscratch/portia/${paths.user}/fly_neuromech/data"
+
+# Submodule paths (relative to project_dir)
+fly_mimic_dir: "${paths.project_dir}/fly_mimic"
+body_models_dir: "${paths.project_dir}/fruitfly_body_models"
+
+# vnc_sims data paths
+vnc_data_dir: "${paths.data_dir}/BANC"
+
+# fly_mimic data paths
+rl_data_dir: "${paths.data_dir}/datasets"
