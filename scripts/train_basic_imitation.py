@@ -332,6 +332,8 @@ def main(cfg: DictConfig):
         kl_ramp=train_config.get('kl_ramp', 1.0),
         kl_ramp_cycles=train_config.get('kl_ramp_cycles', 1),
         warmup_steps=train_config.get('warmup_steps', 0),
+        ar1_weight=train_config.get('ar1_weight', 0.0),
+        use_ar1_schedule=train_config.get('use_ar1_schedule', False),
     )
     
     print(f"\n{'='*70}")

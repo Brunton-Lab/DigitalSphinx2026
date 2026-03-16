@@ -42,6 +42,10 @@ train_args:
   use_kl_schedule: false
   use_mmd_schedule: false
 
+  # AR1 temporal smoothness loss
+  ar1_weight: 0.0
+  use_ar1_schedule: false
+
 # Network architecture - defined in network/*.yaml configs
 
 # Checkpointing
