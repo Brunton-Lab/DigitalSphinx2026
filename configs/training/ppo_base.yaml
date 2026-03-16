@@ -11,7 +11,7 @@ train_setup:
   algo_name: ppo
   num_timesteps: 10_000_000_000
   eval_every: 100_000_000
-  reset_every: 100_000_000
+  reset_every: 25_000_000
   mb_per_env: 21.4
 
 # PPO algorithm parameters
