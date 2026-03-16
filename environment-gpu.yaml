@@ -68,6 +68,7 @@ dependencies:
       - absl-py
       - etils
       - jax_tqdm
+      - uv
 
       # Install local package in editable mode
       # Run after environment creation:

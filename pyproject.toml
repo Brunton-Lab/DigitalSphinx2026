@@ -54,15 +54,16 @@ dependencies = [
     "matplotlib>=3.7",
     "seaborn",
     "mediapy",
-    "imageio",
+    "imageio[ffmpeg]",
     "opencv-python",
     "pillow",
 
     # Logging & monitoring
-    "wandb",
+    "wandb[media]",
 
     # Utilities
     "tqdm",
+    "jax_tqdm",
     "psutil",
     "pyyaml",
     "absl-py",
