@@ -303,13 +303,20 @@ class FruitflyEnv(mjx_env.MjxEnv):
             ))
             self._body_idxs = jnp.array([mujoco.mj_name2id(self._mj_model, mujoco.mju_str2Type("body"), body+self._suffix) for body in self._config.body_names])
             self._end_eff_idxs = jnp.array([mujoco.mj_name2id(self._mj_model, mujoco.mju_str2Type("body"), body+self._suffix) for body in self._config.end_eff_names])
-            self._wing_joint_idxs = jnp.array(mjx_env.get_qpos_ids(self._mj_model, [joint + self._suffix for joint in self._config.wing_names]))
-            self._wing_actuator_idxs = jnp.array([act.id for act in self._spec.actuators if 'wing' in act.name])
-            # Mask to zero out wing actuator ctrl (1.0=keep, 0.0=zero)
-            zero_mask = np.ones(self._mj_model.nu, dtype=np.float32)
-            zero_mask[self._wing_actuator_idxs] = 0.0
-            self._zero_ctrl_mask = jnp.array(zero_mask)
-            self._wing_fluid_idxs = jnp.array([geom.id for geom in self._spec.geoms if 'fluid' in geom.name])
+            if self._enable_flight:
+                self._wing_joint_idxs = jnp.array(mjx_env.get_qpos_ids(self._mj_model, [joint + self._suffix for joint in self._config.wing_names]))
+                self._wing_actuator_idxs = jnp.array([act.id for act in self._spec.actuators if 'wing' in act.name])
+                # Mask to zero out wing actuator ctrl (1.0=keep, 0.0=zero)
+                zero_mask = np.ones(self._mj_model.nu, dtype=np.float32)
+                zero_mask[self._wing_actuator_idxs] = 0.0
+                self._zero_ctrl_mask = jnp.array(zero_mask)
+                self._wing_fluid_idxs = jnp.array([geom.id for geom in self._spec.geoms if 'fluid' in geom.name])
+            else:
+                # Wings may have been removed from model (filter_joints=True); provide safe defaults
+                self._wing_joint_idxs = jnp.array([], dtype=jnp.int32)
+                self._wing_actuator_idxs = jnp.array([], dtype=jnp.int32)
+                self._zero_ctrl_mask = jnp.ones(self._mj_model.nu, dtype=jnp.float32)
+                self._wing_fluid_idxs = jnp.array([], dtype=jnp.int32)
             self._sensor_idxs = jnp.array([sensor.id for sensor in self._spec.sensors if 'contact' in sensor.name])
             self._contact_idxs = jnp.array([self.mj_model.sensor(sensor_idx).adr[0] for sensor_idx in self._sensor_idxs])
             self._floor_height = self._spec.geom("floor").pos[2]
