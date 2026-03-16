@@ -18,13 +18,13 @@ train_setup:
 train_args:
   seed: ${seed}
   num_envs: 4096
-  batch_size: 512
+  batch_size: 1024
   reward_scaling: 1
   normalize_observations: true
   action_repeat: 1
   clipping_epsilon: 0.2
   unroll_length: 20
-  num_minibatches: 16
+  num_minibatches: 32
   num_updates_per_batch: 4
   discounting: 0.95
   entropy_cost: 1e-2
