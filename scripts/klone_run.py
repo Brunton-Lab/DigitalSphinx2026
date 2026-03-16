@@ -40,7 +40,7 @@ def submit(
     """Submit job to cluster."""
     script = f"""#!/bin/bash
 #SBATCH --job-name={job_name}    
-#SBATCH --qos={partition}
+#SBATCH --partition={partition}
 #SBATCH --account=portia
 #SBATCH --time={time}
 #SBATCH --nodes=1
@@ -84,16 +84,16 @@ def main():
                         help='Number of CPU cores (default: 8)')
     parser.add_argument('--time', type=str, default='1-00:00:00',
                         help='Time limit for the job day-hr-min-sec (default: 1-00:00:00)')
-    parser.add_argument('--partition', type=str, default='normal',
-                        help='Partition to run job (default: normal)')
+    parser.add_argument('--partition', type=str, default='gpu-l40s',
+                        help='Partition to run job (default: gpu-l40s)')
     parser.add_argument('--note', type=str, default='hyak_ckpt',
                         help='Note for job (default: hyak_ckpt)')
     parser.add_argument('--dataset', type=str, default='imitation_walk_anipose_data_v1',
                         help='Name of dataset yaml  (default: imitation_walk_anipose_data_v1)')
     parser.add_argument('--training', type=str, default='ppo_basic_imitation_low_kl',
                         help='Name of training yaml  (default: ppo_basic_imitation_low_kl)')
-    parser.add_argument('--paths', type=str, default='tillicum',
-                        help='Name of paths yaml  (default: tillicum)')
+    parser.add_argument('--paths', type=str, default='hyak',
+                        help='Name of paths yaml  (default: hyak)')
     parser.add_argument('--load_jobid', type=str, default='',
                         help='JobID to load policy/rollout from (default: '')')
     parser.add_argument('--resume_jobid', type=str, default='',
