@@ -2,7 +2,7 @@
 user: eabe
 
 # Base directories
-project_dir: "/gscratch/portia/${paths.user}/Research/MyRepos/TheSphinx2026"
+project_dir: "/gscratch/portia/${paths.user}/Research/MyRepos/DigitalSphinx2026"
 base_dir: "/gscratch/portia/${paths.user}/TheSphinx/${version}"
 save_dir: ${multirun_save_dir:${paths.base_dir},${run_id}}
 log_dir:  "${paths.save_dir}/logs/"
