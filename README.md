@@ -2,7 +2,7 @@
 
 Integrated neuromechanical simulation for *Drosophila* combining C. elegans connectome dynamics with physics-based body models.
 
-This project trains reinforcement learning policies for fruit fly locomotion control using JAX, MuJoCo/MJX, and Brax. It supports imitation learning from real fly kinematics data with connectome-informed neural architectures.
+This project trains reinforcement learning policies for fruit fly locomotion control using JAX, MuJoCo/MJX, and Brax. It supports imitation learning from real fly kinematics data with C. elegans.
 
 ## Requirements
 
