@@ -10,8 +10,8 @@ train_setup:
   wandb_project: "fly_neuromechanics"
   algo_name: ppo
   num_timesteps: 10_000_000_000
-  eval_every: 50_000_000
-  reset_every: 50_000_000
+  eval_every: 100_000_000
+  reset_every: 100_000_000
   mb_per_env: 21.4
 
 # PPO algorithm parameters
@@ -24,11 +24,11 @@ train_args:
   action_repeat: 1
   clipping_epsilon: 0.2
   unroll_length: 20
-  num_minibatches: 32
-  num_updates_per_batch: 8
+  num_minibatches: 16
+  num_updates_per_batch: 4
   discounting: 0.95
   entropy_cost: 1e-2
-  learning_rate: 1e-4
+  learning_rate: 3e-4
   max_grad_norm: 1.0
   
   # Distribution matching losses
