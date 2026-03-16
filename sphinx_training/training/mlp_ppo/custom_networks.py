@@ -51,10 +51,17 @@ class MLP(nn.Module):
         return x
 
 
-def reparameterize(rng, mean, logvar):
+def _reparameterize_single(rng, mean, logvar):
     std = jnp.exp(0.5 * logvar)
     eps = random.normal(rng, logvar.shape)
     return mean + eps * std
+
+
+def reparameterize(rng, mean, logvar):
+    if rng.ndim == 1:
+        return _reparameterize_single(rng, mean, logvar)
+    else:
+        return jax.vmap(_reparameterize_single)(rng, mean, logvar)
 
 
 class IntentionNetwork(nn.Module):
@@ -71,8 +78,19 @@ class IntentionNetwork(nn.Module):
         self.decoder = MLP(layer_sizes=self.decoder_layers)
 
     def __call__(self, obs, key):
-        _, encoder_rng = jax.random.split(key)
         traj = obs[..., : self.task_obs_size]
+
+        # Handle key splitting based on key shape and observation shape
+        obs_is_batched = traj.ndim >= 2
+        if key.ndim == 1:
+            # Single key - split for encoder (eval/inference)
+            _, encoder_rng = jax.random.split(key)
+        elif not obs_is_batched:
+            # Per-sample keys but unbatched observation - use first key
+            _, encoder_rng = jax.random.split(key[0])
+        else:
+            # Per-sample keys [batch_size, 2] - vmap split over batch
+            _, encoder_rng = jax.vmap(jax.random.split)(key).swapaxes(0, 1)
         latent_mean, latent_logvar = self.latent(self.encoder(traj))
         z = reparameterize(encoder_rng, latent_mean, latent_logvar)
         action = self.decoder(
@@ -93,10 +111,14 @@ class RandomIntentionNetwork(nn.Module):
         self.decoder = MLP(layer_sizes=self.decoder_layers)
 
     def __call__(self, obs, key):
-        _, intention_rng = jax.random.split(key)
-
-        # Hack to get the right shape
-        z = jax.random.normal(intention_rng, obs.shape)
+        if key.ndim == 1:
+            _, intention_rng = jax.random.split(key)
+            z = jax.random.normal(intention_rng, obs.shape)
+        else:
+            _, intention_rng = jax.vmap(jax.random.split)(key).swapaxes(0, 1)
+            def _sample(k, o):
+                return jax.random.normal(k, o.shape)
+            z = jax.vmap(_sample)(intention_rng, obs)
         action = self.decoder(
             jnp.concatenate(
                 [z[..., : self.latents], obs[..., self.task_obs_size :]], axis=-1

@@ -45,7 +45,11 @@ def make_inference_fn(ppo_networks: PPONetworks):
         ) -> Tuple[types.Action, types.Extra]:
             key_sample, key_network = jax.random.split(key_sample)
             param_subset = (params[0], params[1])  # normalizer and policy params
-            logits, extras = policy_network.apply(*param_subset, observations, key_network)
+            # Create per-sample keys for deterministic stochastic layer replay
+            obs_leaf = jax.tree_util.tree_leaves(observations)[0]
+            num_samples = obs_leaf.shape[0]
+            per_sample_keys = jax.random.split(key_network, num_samples)
+            logits, extras = policy_network.apply(*param_subset, observations, per_sample_keys)
 
             if deterministic:
                 return ppo_networks.parametric_action_distribution.mode(logits), extras
@@ -64,7 +68,7 @@ def make_inference_fn(ppo_networks: PPONetworks):
                 "log_prob": log_prob,
                 "raw_action": raw_actions,
                 "logits": logits,
-                "policy_rng": key_network,
+                "policy_rng": per_sample_keys,
             }
 
         return policy
