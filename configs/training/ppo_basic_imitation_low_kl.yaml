@@ -11,7 +11,7 @@ defaults:
 # Override task name to match environment
 train_setup:
   task_name: ${dataset.env_name}
-  wandb_project: "celegans_kl_cl_off"
+  wandb_project: "celegans"
 
 
 
