@@ -213,7 +213,12 @@ class LatentStateWrapper:
         actor_obs = jnp.concatenate([target, motor_h], axis=-1)
         # 3. return env state with updated obs and h_state
         info = dict(state.info)
-        info["h"] = h  
+        info["h"] = h
+        # Update obs_sizes to reflect the wrapper's observation shape
+        info["obs_sizes"] = {
+            "task_obs_size": self.adapter.task_obs_size,
+            "proprioception": motor_h.shape[-1],  # motor neuron output replaces raw proprio
+        }
         return state.replace(obs=actor_obs, info=info)
 
     def step(

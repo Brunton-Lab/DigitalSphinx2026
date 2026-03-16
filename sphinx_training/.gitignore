@@ -178,3 +178,5 @@ tmp/
 Testing/
 
 *eabe.yaml
+.vscode/
+*.claude/
