@@ -52,13 +52,3 @@ try:
     from . import io_dict_to_hdf5
 except ImportError:
     pass
-
-try:
-    from . import create_hfield
-except ImportError:
-    pass
-
-try:
-    from . import Terrain_Utils
-except ImportError:
-    pass

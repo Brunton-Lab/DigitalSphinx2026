@@ -510,8 +510,8 @@ def load_reference_clip_for_estimation(cfg):
     """
     try:
         # Import required modules
-        import utils.io_dict_to_hdf5 as ioh5
-        from utils.data_utils import ReferenceClips
+        import fly_mimic.utils.io_dict_to_hdf5 as ioh5
+        from fly_mimic.utils.data_utils import ReferenceClips
         import jax.numpy as jnp
         
         env_cfg = cfg.dataset
