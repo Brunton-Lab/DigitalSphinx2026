@@ -7,7 +7,7 @@ import imageio
 import time
 import glob
 from pathlib import Path
-from fly_mimic.utils.utils import add_trajectory_sites_spheres, add_cross_hair_sites
+from sphinx_training.utils.utils import add_trajectory_sites_spheres, add_cross_hair_sites
 
 
 def cleanup_old_eval_artifacts(keep_n_recent=1):
