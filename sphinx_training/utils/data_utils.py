@@ -96,6 +96,52 @@ class ReferenceClips:
                                         compression_opts=compression_opts,
                                         clips_per_chunk=clips_per_chunk)
 
+    # ===== SLICING METHODS =====
+    def slice_to_joints(self, joint_names: list[str], qpos_names: list[str]) -> 'ReferenceClips':
+        """Slice qpos/qvel to only include joints listed in joint_names.
+
+        Builds a mapping from qpos_names (joint-only, 0-indexed from the HDF5)
+        to find the column index in the full reference for each requested joint.
+        Root DOFs are always preserved (first 7 qpos cols, first 6 qvel cols).
+        xpos/xquat are unchanged since bodies are not removed by joint filtering.
+
+        Args:
+            joint_names: List of joint names to keep (from config).
+            qpos_names: List of joint names from the reference HDF5
+                        (indices correspond to qpos columns offset by 7).
+        Returns:
+            New ReferenceClips with sliced qpos/qvel and updated qpos_names.
+        """
+        name_to_ref_idx = {name: i for i, name in enumerate(qpos_names)}
+
+        # Root DOFs are always kept
+        qpos_cols = list(range(7))   # root pos (3) + root quat (4)
+        qvel_cols = list(range(6))   # root linear vel (3) + root angular vel (3)
+        kept_names = []
+
+        for jname in joint_names:
+            if jname not in name_to_ref_idx:
+                raise ValueError(
+                    f"Joint '{jname}' from config not found in reference "
+                    f"qpos_names. Available: {qpos_names}"
+                )
+            ref_joint_idx = name_to_ref_idx[jname]
+            qpos_cols.append(ref_joint_idx + 7)  # +7 for root offset in qpos
+            qvel_cols.append(ref_joint_idx + 6)  # +6 for root offset in qvel
+            kept_names.append(jname)
+
+        qpos_cols = jnp.array(qpos_cols)
+        qvel_cols = jnp.array(qvel_cols)
+
+        new_qpos = self.qpos[..., qpos_cols]
+        new_qvel = self.qvel[..., qvel_cols]
+
+        print(f"slice_to_joints: {self.qpos.shape[-1]} -> {new_qpos.shape[-1]} qpos cols, "
+              f"{self.qvel.shape[-1]} -> {new_qvel.shape[-1]} qvel cols "
+              f"({len(kept_names)} joints kept)")
+
+        return self.replace(qpos=new_qpos, qvel=new_qvel, qpos_names=kept_names)
+
     # ===== INSTANCE METHODS (operate on self) =====
     def extract_clip(self, clip_index, return_type='class'):
         """Extract a single clip from this multi-clip instance."""

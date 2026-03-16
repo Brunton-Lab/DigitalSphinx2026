@@ -89,7 +89,7 @@ class Imitation(fruitfly_base.FruitflyEnv):
         self.add_fly(
             rescale_factor=self._config.rescale_factor,
             torque_actuators=self._config.torque_actuators,
-            only_T1=self._config.only_T1
+            filter_joints=self._config.filter_joints,
         )
         self.compile(mjx_model=True)
 
@@ -97,9 +97,16 @@ class Imitation(fruitfly_base.FruitflyEnv):
             self.reference_clips = reference_clips
         else:
             # 030226 changed this since mine is named datasets not clips
-            (ref_train, ref_test) = HDF5ReferenceClips(cfg.paths.data_dir / f"datasets/{cfg.dataset.clip_idx}").split(test_ratio=env_args.test_ratio)
-            # (ref_train, ref_test) = ReferenceClips.from_path(cfg.paths.data_dir / f"clips/{cfg.dataset.clip_idx}").split(test_ratio=env_args.test_ratio)
-            self.reference_clips = ref_train.load_all_clips() if cfg.dataset.train else ref_test.load_all_clips()
+            hdf5_clips = HDF5ReferenceClips(cfg.paths.data_dir / f"datasets/{cfg.dataset.clip_idx}")
+            (ref_train, ref_test) = hdf5_clips.split(test_ratio=env_args.test_ratio)
+            clips = ref_train.load_all_clips() if cfg.dataset.train else ref_test.load_all_clips()
+
+            # When joint filtering is active, slice reference qpos/qvel to match
+            # the sim model's joint layout so the same indices work for both.
+            if getattr(self._config, 'filter_joints', False) and hdf5_clips.qpos_names is not None:
+                clips = clips.slice_to_joints(self._config.joint_names, hdf5_clips.qpos_names)
+
+            self.reference_clips = clips
         print(f"Loaded {self.reference_clips.num_clips} reference clips for {'training' if cfg.dataset.train else 'testing'}.")
 
 
@@ -762,32 +769,37 @@ class Imitation(fruitfly_base.FruitflyEnv):
         # self._joint_idxs are qpos slot numbers derived from the *sim* model.
         # They are used as-is to index reference.qpos in rewards and observations
         # (e.g. target.qpos[..., self._joint_idxs]).  For this to be correct the
-        # reference must have been preprocessed from a model with the same qpos
-        # ordering.  qpos_names gives us a ground-truth label for each slot in
-        # the reference, so we can verify the mapping directly.
+        # reference must have the same qpos ordering (either natively or after
+        # slice_to_joints()).  reference.qpos_names lists the joint-only names
+        # in the order they appear in reference.qpos (starting after the 7 root
+        # DOFs), so qpos_names[i] corresponds to qpos column i+7.
         if reference.qpos_names is not None:
             print("  Checking joint qpos ordering against reference.qpos_names...")
             qpos_check_passed = True
             _wing_joints = set(self._config.wing_names)
             joint_reward_names = [j for j in self._config.joint_names if j not in _wing_joints]
+            # Build a mapping from qpos slot → joint name using reference.qpos_names
+            # qpos_names[i] corresponds to qpos column i + 7 (root offset)
+            slot_to_name = {i + 7: name for i, name in enumerate(reference.qpos_names)}
             for joint_name, joint_idx in zip(joint_reward_names, self._joint_reward_idxs):
                 idx = int(joint_idx)
-                if idx >= len(reference.qpos_names):
+                if idx not in slot_to_name:
                     warnings.warn(
-                        f"joint_idx={idx} for '{joint_name}' is out of range "
-                        f"for reference.qpos_names (len={len(reference.qpos_names)})."
+                        f"joint_idx={idx} for '{joint_name}' not found in "
+                        f"reference.qpos_names slot mapping "
+                        f"(available slots: {sorted(slot_to_name.keys())})."
                     )
                     all_passed = False
                     qpos_check_passed = False
                     continue
-                ref_name = reference.qpos_names[idx]
+                ref_name = slot_to_name[idx]
                 # The reference may have been generated without self._suffix; strip
                 # it from the reference name if present before comparing.
                 ref_name_stripped = ref_name.removesuffix(self._suffix) if self._suffix else ref_name
                 if ref_name_stripped != joint_name:
                     warnings.warn(
                         f"Joint qpos mismatch: sim joint '{joint_name}' uses "
-                        f"qpos idx={idx}, but reference.qpos_names[{idx}]='{ref_name}' "
+                        f"qpos idx={idx}, but reference.qpos_names slot {idx}='{ref_name}' "
                         f"(stripped: '{ref_name_stripped}'). "
                         f"Joint rewards/observations may compare wrong joints."
                     )
@@ -1052,7 +1064,7 @@ class Imitation(fruitfly_base.FruitflyEnv):
 
         # Create a new spec with a ghost, without modifying the existing one
         if add_ghost:
-            spec_pair = self.add_ghost_fly(only_T1=self._config.only_T1)
+            spec_pair = self.add_ghost_fly(filter_joints=self._config.filter_joints)
         else:
             spec_pair = self._spec.copy()
 

@@ -68,69 +68,84 @@ class FruitflyEnv(mjx_env.MjxEnv):
         self._enable_wbpg = getattr(config, 'enable_wbpg', True)
 
 
-    def filter_model_to_t1_only(self, spec: Optional[mujoco.MjSpec] = None, xml_path: Optional[str] = None):
-        """
-        Remove all joints, actuators, and tendons that don't contain 'T1' in their name
-        using spec.delete() API.
-        
+    def filter_model_to_config_joints(self, spec: Optional[mujoco.MjSpec] = None, xml_path: Optional[str] = None):
+        """Remove joints, actuators, tendons, and sensors not matching
+        ``config.joint_names`` from *spec*.
+
+        Only joints whose name appears in ``self._config.joint_names`` are kept.
+        Actuators are kept when their name matches a kept joint.  Tendons are
+        kept when any kept joint name is a substring of the tendon name or
+        vice-versa (handles coupled tendons like ``abduct_abdomen``).  Sensors
+        are kept when any kept joint name appears in the sensor name, or the
+        sensor has no joint reference (global sensors like accelerometer/gyro).
+
         Args:
-            spec: Optional MjSpec to filter. If None, will load from xml_path or self._walker_xml_path
+            spec: Optional MjSpec to filter. If None, will load from xml_path
+                  or ``self._walker_xml_path``.
             xml_path: Optional path to MuJoCo XML file. Used if spec is None.
-            
+
         Returns:
-            Filtered MjSpec with only T1 joints, actuators, and tendons (and wings)
+            Filtered MjSpec.
         """
-        # Load spec if not provided
         if spec is None:
             path = xml_path if xml_path is not None else self._walker_xml_path
             spec = mujoco.MjSpec.from_file(path)
-        
-        # Collect all joints to delete (need to collect first, then delete)
+
+        allowed_joints = set(self._config.joint_names)
+
+        # --- Joints ---
         joints_to_delete = []
         for body in spec.bodies:
             for joint in body.joints:
-                if ('T1' not in joint.name) & ('wing' not in joint.name):
+                if joint.name not in allowed_joints:
                     joints_to_delete.append(joint)
-        
-        # Collect all actuators to delete
+
+        # --- Actuators (names match joint names in this model) ---
         actuators_to_delete = []
         for actuator in spec.actuators:
-            if ('T1' not in actuator.name) & ('wing' not in actuator.name):
+            if actuator.name not in allowed_joints:
                 actuators_to_delete.append(actuator)
-        
-        # Collect all tendons to delete
+
+        # --- Tendons (coupled joints — keep if any allowed joint name is a
+        #     substring of the tendon name or vice-versa) ---
         tendons_to_delete = []
         for tendon in spec.tendons:
-            if 'T1' not in tendon.name:
+            keep = any(
+                jname in tendon.name or tendon.name in jname
+                for jname in allowed_joints
+            )
+            if not keep:
                 tendons_to_delete.append(tendon)
-        
-        # Collect all tendons to delete
+
+        # --- Sensors (keep global sensors + those referencing allowed joints) ---
+        # Global sensors (accelerometer, gyro, velocimeter) have no body/joint
+        # reference in their name so we keep them.  Body-specific sensors
+        # contain a body segment identifier (e.g. ``force_tarsus_T1_left``).
         sensors_to_delete = []
         for sensor in spec.sensors:
-            if 'T1' not in sensor.name:
+            # Keep if any allowed joint name appears as substring in sensor name
+            keep = any(jname in sensor.name for jname in allowed_joints)
+            # Also keep global sensors (no underscore-separated body reference)
+            if not keep and '_' not in sensor.name:
+                keep = True
+            if not keep:
                 sensors_to_delete.append(sensor)
-                
-        print(f"Joints: {len(spec.bodies)} bodies, removing {len(joints_to_delete)} joints without 'T1'")
-        print(f"Actuators: {len(list(spec.actuators))} total, removing {len(actuators_to_delete)} without 'T1'")
-        print(f"Tendons: {len(list(spec.tendons))} total, removing {len(tendons_to_delete)} without 'T1'")
-        print(f"Sensors: {len(list(spec.sensors))} total, removing {len(sensors_to_delete)} without 'T1'")
-        
-        # Delete joints
+
+        print(f"filter_model_to_config_joints: keeping {len(allowed_joints)} joint names")
+        print(f"  Joints:    removing {len(joints_to_delete)} of {sum(len(list(b.joints)) for b in spec.bodies)}")
+        print(f"  Actuators: removing {len(actuators_to_delete)} of {len(list(spec.actuators))}")
+        print(f"  Tendons:   removing {len(tendons_to_delete)} of {len(list(spec.tendons))}")
+        print(f"  Sensors:   removing {len(sensors_to_delete)} of {len(list(spec.sensors))}")
+
         for joint in joints_to_delete:
             spec.delete(joint)
-        
-        # Delete actuators
         for actuator in actuators_to_delete:
             spec.delete(actuator)
-        
-        # Delete tendons
         for tendon in tendons_to_delete:
             spec.delete(tendon)
-        
-        # Delete sensors
         for sensor in sensors_to_delete:
             spec.delete(sensor)
-                        
+
         return spec
 
     def add_fly(
@@ -142,7 +157,7 @@ class FruitflyEnv(mjx_env.MjxEnv):
         rgba: Optional[tuple[float, float, float, float]] = None,
         suffix: str = "-fly",
         new_spec: Optional[mujoco.MjSpec] = None,
-        only_T1: Optional[bool] = False,
+        filter_joints: bool = False,
     ) -> None:
         """Adds the fly model to the environment.
 
@@ -154,14 +169,15 @@ class FruitflyEnv(mjx_env.MjxEnv):
             rgba: RGBA color values (red, green, blue, alpha) for recoloring the body.
                 If None, no recoloring is applied. Defaults to None.
             suffix: Suffix to append to body names. Defaults to "-fly".
-            only_T1: Whether to filter model to only T1 segments. Defaults to False.
+            filter_joints: Whether to filter the model to only keep joints
+                listed in ``config.joint_names``. Defaults to False.
         """
         # Load base fly spec
         fly = mujoco.MjSpec.from_file(self._walker_xml_path)
-        
-        # Filter to T1 only if requested
-        if only_T1:
-            fly = self.filter_model_to_t1_only(spec=fly)
+
+        # Filter to config joints if requested
+        if filter_joints:
+            fly = self.filter_model_to_config_joints(spec=fly)
 
         if rescale_factor != 1.0:
             logging.info(f"Rescaling body tree with scale factor {rescale_factor}")
@@ -193,30 +209,31 @@ class FruitflyEnv(mjx_env.MjxEnv):
         pos=(0, 0, 0.05),
         ghost_rgba=(0.8, 0.8, 0.8, 0.3),
         suffix="-ghost",
-        only_T1: bool = False,
+        filter_joints: bool = False,
     ):
         """Adds a ghost fly model to the environment.
-        
+
         Args:
             rescale_factor: Factor to rescale the ghost body. Defaults to 1.0.
             pos: Position to spawn the ghost. Defaults to (0, 0, 0.05).
             ghost_rgba: RGBA color for the ghost. Defaults to (0.8, 0.8, 0.8, 0.3).
             suffix: Suffix for the ghost body names. Defaults to "-ghost".
-            only_T1: Whether to filter model to only T1 segments. Defaults to False.
+            filter_joints: Whether to filter model to only keep joints
+                listed in ``config.joint_names``. Defaults to False.
         """
         new_spec = mujoco.MjSpec.from_file(str(self._config._arena_xml_path))
         new_spec = self.add_fly(
             rescale_factor=self._config.rescale_factor,
             torque_actuators=self._config.torque_actuators,
             new_spec=new_spec,
-            only_T1=only_T1)
-        
+            filter_joints=filter_joints)
+
         # Load ghost fly spec
         fly_spec = mujoco.MjSpec.from_file(self._walker_xml_path)
-        
-        # Filter to T1 only if requested
-        if only_T1:
-            fly_spec = self.filter_model_to_t1_only(spec=fly_spec)
+
+        # Filter to config joints if requested
+        if filter_joints:
+            fly_spec = self.filter_model_to_config_joints(spec=fly_spec)
         # Scale and recolor the ghost body
         for body in fly_spec.worldbody.bodies:
             _scale_body_tree(body, rescale_factor)

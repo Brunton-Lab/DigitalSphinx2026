@@ -66,44 +66,44 @@ body_names:
 
 joint_names:
   # Head and antenna joints 
-  - head_abduct
-  - head_twist
-  - head
-  - antenna_abduct_left
-  - antenna_twist_left
-  - antenna_left
-  - antenna_abduct_right
-  - antenna_twist_right
-  - antenna_right
-  - rostrum
-  - haustellum_abduct
-  - haustellum
-  - labrum_left
-  - labrum_right
+  # - head_abduct
+  # - head_twist
+  # - head
+  # - antenna_abduct_left
+  # - antenna_twist_left
+  # - antenna_left
+  # - antenna_abduct_right
+  # - antenna_twist_right
+  # - antenna_right
+  # - rostrum
+  # - haustellum_abduct
+  # - haustellum
+  # - labrum_left
+  # - labrum_right
 
   # Wing joints (same as v2)
-  - wing_yaw_left
-  - wing_roll_left
-  - wing_pitch_left
-  - wing_yaw_right
-  - wing_roll_right
-  - wing_pitch_right
+  # - wing_yaw_left
+  # - wing_roll_left
+  # - wing_pitch_left
+  # - wing_yaw_right
+  # - wing_roll_right
+  # - wing_pitch_right
 
   # Abdomen joints (same as v2)
-  - abdomen_abduct
-  - abdomen
-  - abdomen_abduct_2
-  - abdomen_2
-  - abdomen_abduct_3
-  - abdomen_3
-  - abdomen_abduct_4
-  - abdomen_4
-  - abdomen_abduct_5
-  - abdomen_5
-  - abdomen_abduct_6
-  - abdomen_6
-  - abdomen_abduct_7
-  - abdomen_7
+  # - abdomen_abduct
+  # - abdomen
+  # - abdomen_abduct_2
+  # - abdomen_2
+  # - abdomen_abduct_3
+  # - abdomen_3
+  # - abdomen_abduct_4
+  # - abdomen_4
+  # - abdomen_abduct_5
+  # - abdomen_5
+  # - abdomen_abduct_6
+  # - abdomen_6
+  # - abdomen_abduct_7
+  # - abdomen_7
 
   # T1 leg joints - V1 has femur_twist joints that v2 doesn't have
   - coxa_abduct_T1_left

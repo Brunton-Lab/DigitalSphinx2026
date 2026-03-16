@@ -21,7 +21,7 @@ env_args:
   nconmax: 256
   njmax: 512
   torque_actuators: True
-  only_T1: false
+  filter_joints: true  # When true, removes joints/actuators not in anatomy config joint_names
   physics_steps_per_control_step: 5
   mocap_hz: 500
   test_ratio: 0.4
