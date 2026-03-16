@@ -57,15 +57,16 @@ dependencies:
 
       # Visualization & media
       - mediapy
-      - imageio
+      - imageio[ffmpeg]
       - opencv-python
 
       # Logging
-      - wandb
+      - wandb[media]
 
       # Utilities
       - absl-py
       - etils
+      - jax_tqdm
 
       # Install local package in editable mode
       # Run after environment creation:
