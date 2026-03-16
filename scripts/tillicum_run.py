@@ -136,6 +136,5 @@ if __name__ == "__main__":
 #### wandb regex: ^(?!.*table)(?!.*std).*$|^reward*&
 
 python ./scripts/tillicum_run.py --partition=normal --num_gpus=1 --script_name=train_basic_imitation --override='train_args.num_envs=8192'
-python ./scripts/tillicum_run.py --partition=ckpt-g2 --num_gpus=8 --script_name=train_basic_imitation --override='train_args.num_envs=4096'
 
 '''
