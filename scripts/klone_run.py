@@ -108,10 +108,10 @@ def main():
                         help='Partition to run job (default: gpu-l40s)')
     parser.add_argument('--note', type=str, default='hyak_ckpt',
                         help='Note for job (default: hyak_ckpt)')
-    parser.add_argument('--dataset', type=str, default='imitation_static',
-                        help='Name of dataset yaml  (default: imitation_static)')
-    parser.add_argument('--training', type=str, default='ppo_basic_imitation',
-                        help='Name of training yaml  (default: ppo_basic_imitation)')
+    parser.add_argument('--dataset', type=str, default='imitation_walk_anipose_data_v1',
+                        help='Name of dataset yaml  (default: imitation_walk_anipose_data_v1)')
+    parser.add_argument('--training', type=str, default='ppo_basic_imitation_low_kl',
+                        help='Name of training yaml  (default: ppo_basic_imitation_low_kl)')
     parser.add_argument('--paths', type=str, default='hyak',
                         help='Name of paths yaml  (default: hyak)')
     parser.add_argument('--load_jobid', type=str, default='',
