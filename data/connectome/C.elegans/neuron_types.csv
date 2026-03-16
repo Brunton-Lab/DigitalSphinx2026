@@ -1,0 +1,303 @@
+name,type
+I1L,interneuron
+I1R,interneuron
+I2L,interneuron
+I2R,interneuron
+I3,interneuron
+I4,interneuron
+I5,interneuron
+I6,interneuron
+M1,motor
+M2L,motor
+M2R,motor
+M3L,motor
+M3R,motor
+M4,motor
+M5,motor
+MCL,motor
+MCR,motor
+MI,motor
+NSML,interneuron
+NSMR,interneuron
+ASIL,sensory
+ASIR,sensory
+ASJL,sensory
+ASJR,sensory
+AWAL,sensory
+AWAR,sensory
+ASGL,sensory
+ASGR,sensory
+AWBL,sensory
+AWBR,sensory
+ASEL,sensory
+ASER,sensory
+ADFL,sensory
+ADFR,sensory
+AFDL,sensory
+AFDR,sensory
+AWCL,sensory
+AWCR,sensory
+ASKL,sensory
+ASKR,sensory
+ASHL,sensory
+ASHR,sensory
+ADLL,sensory
+ADLR,sensory
+BAGL,sensory
+BAGR,sensory
+URXL,sensory
+URXR,sensory
+ALNL,sensory
+ALNR,sensory
+PLNL,sensory
+PLNR,sensory
+SDQL,sensory
+SDQR,sensory
+AQR,sensory
+PQR,sensory
+ALML,sensory
+ALMR,sensory
+AVM,sensory
+PVM,sensory
+PLML,sensory
+PLMR,sensory
+FLPL,sensory
+FLPR,sensory
+DVA,interneuron
+PVDL,sensory
+PVDR,sensory
+ADEL,sensory
+ADER,sensory
+PDEL,sensory
+PDER,sensory
+PHAL,sensory
+PHAR,sensory
+PHBL,sensory
+PHBR,sensory
+PHCL,sensory
+PHCR,sensory
+IL2DL,sensory
+IL2DR,sensory
+IL2L,sensory
+IL2R,sensory
+IL2VL,sensory
+IL2VR,sensory
+CEPDL,sensory
+CEPDR,sensory
+CEPVL,sensory
+CEPVR,sensory
+URYDL,sensory
+URYDR,sensory
+URYVL,sensory
+URYVR,sensory
+OLLL,sensory
+OLLR,sensory
+OLQDL,sensory
+OLQDR,sensory
+OLQVL,sensory
+OLQVR,sensory
+IL1DL,sensory
+IL1DR,sensory
+IL1L,sensory
+IL1R,sensory
+IL1VL,sensory
+IL1VR,sensory
+AINL,interneuron
+AINR,interneuron
+AIML,interneuron
+AIMR,interneuron
+RIH,interneuron
+URBL,interneuron
+URBR,interneuron
+RIR,interneuron
+AIYL,interneuron
+AIYR,interneuron
+AIAL,interneuron
+AIAR,interneuron
+AUAL,interneuron
+AUAR,interneuron
+AIZL,interneuron
+AIZR,interneuron
+RIS,interneuron
+ALA,interneuron
+PVQL,interneuron
+PVQR,interneuron
+ADAL,interneuron
+ADAR,interneuron
+RIFL,interneuron
+RIFR,interneuron
+BDUL,interneuron
+BDUR,interneuron
+PVR,interneuron
+AVFL,interneuron
+AVFR,interneuron
+AVHL,interneuron
+AVHR,interneuron
+PVPL,interneuron
+PVPR,interneuron
+LUAL,interneuron
+LUAR,interneuron
+PVNL,interneuron
+PVNR,interneuron
+AVG,interneuron
+DVB,interneuron
+RIBL,interneuron
+RIBR,interneuron
+RIGL,interneuron
+RIGR,interneuron
+RMGL,head motor
+RMGR,head motor
+AIBL,interneuron
+AIBR,interneuron
+RICL,interneuron
+RICR,interneuron
+SAADL,interneuron
+SAADR,interneuron
+SAAVL,interneuron
+SAAVR,interneuron
+AVKL,interneuron
+AVKR,interneuron
+DVC,interneuron
+AVJL,interneuron
+AVJR,interneuron
+PVT,interneuron
+AVDL,interneuron
+AVDR,interneuron
+AVL,interneuron
+PVWL,interneuron
+PVWR,interneuron
+RIAL,interneuron
+RIAR,interneuron
+RIML,head motor
+RIMR,head motor
+AVEL,command
+AVER,command
+RMFL,head motor
+RMFR,head motor
+RID,interneuron
+AVBL,command
+AVBR,command
+AVAL,command
+AVAR,command
+PVCL,command
+PVCR,command
+RIPL,interneuron
+RIPR,interneuron
+URADL,head motor
+URADR,head motor
+URAVL,head motor
+URAVR,head motor
+RMEL,head motor
+RMER,head motor
+RMED,head motor
+RMEV,head motor
+RMDDL,head motor
+RMDDR,head motor
+RMDL,head motor
+RMDR,head motor
+RMDVL,head motor
+RMDVR,head motor
+RIVL,head motor
+RIVR,head motor
+RMHL,head motor
+RMHR,head motor
+SABD,head motor
+SABVL,head motor
+SABVR,head motor
+SMDDL,head motor
+SMDDR,head motor
+SMDVL,head motor
+SMDVR,head motor
+SMBDL,head motor
+SMBDR,head motor
+SMBVL,head motor
+SMBVR,head motor
+SIBDL,head motor
+SIBDR,head motor
+SIBVL,head motor
+SIBVR,head motor
+SIADL,head motor
+SIADR,head motor
+SIAVL,head motor
+SIAVR,head motor
+DA01,motor
+DA02,motor
+DA03,motor
+DA04,motor
+DA05,motor
+DA06,motor
+DA07,motor
+DA08,motor
+DA09,motor
+PDA,motor
+DB01,motor
+DB02,motor
+DB03,motor
+DB04,motor
+DB05,motor
+DB06,motor
+DB07,motor
+AS01,motor
+AS02,motor
+AS03,motor
+AS04,motor
+AS05,motor
+AS06,motor
+AS07,motor
+AS08,motor
+AS09,motor
+AS10,motor
+AS11,motor
+PDB,motor
+DD01,motor
+DD02,motor
+DD03,motor
+DD04,motor
+DD05,motor
+DD06,motor
+VA01,motor
+VA02,motor
+VA03,motor
+VA04,motor
+VA05,motor
+VA06,motor
+VA07,motor
+VA08,motor
+VA09,motor
+VA10,motor
+VA11,motor
+VA12,motor
+VB01,motor
+VB02,motor
+VB03,motor
+VB04,motor
+VB05,motor
+VB06,motor
+VB07,motor
+VB08,motor
+VB09,motor
+VB10,motor
+VB11,motor
+VD01,motor
+VD02,motor
+VD03,motor
+VD04,motor
+VD05,motor
+VD06,motor
+VD07,motor
+VD08,motor
+VD09,motor
+VD10,motor
+VD11,motor
+VD12,motor
+VD13,motor
+CANL,interneuron
+CANR,interneuron
+HSNL,motor
+HSNR,motor
+VC01,motor
+VC02,motor
+VC03,motor
+VC04,motor
+VC05,motor
+VC06,motor

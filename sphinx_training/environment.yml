@@ -1,8 +1,8 @@
 name: fly_tracking
 channels:
   - conda-forge
-  - anaconda
   - menpo
+  - anaconda
 dependencies:
   - python=3.11
   - numpy
@@ -23,9 +23,7 @@ dependencies:
       - jax[cuda12]
       - h5py
       - natsort
-      - nvidia-ml-py3
       - tqdm
-      - psutil
       - mediapy
       - imageio[ffmpeg]
 variables:             # Set MuJoCo environment variables
