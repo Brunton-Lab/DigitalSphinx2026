@@ -2,8 +2,8 @@
 Utilities for fly tracking research.
 
 Import modules explicitly to avoid namespace collisions:
-    from fly_mimic.utils import data_utils
-    from fly_mimic.utils import path_utils
+    from sphinx_training.utils import data_utils
+    from sphinx_training.utils import path_utils
     etc.
 """
 

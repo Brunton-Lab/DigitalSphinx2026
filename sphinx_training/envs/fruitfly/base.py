@@ -13,8 +13,9 @@ from mujoco import mjx
 
 from mujoco_playground._src import mjx_env
 from mujoco.mjx._src import math as mj_math
-from fly_mimic.utils.utils import change_body_frame, neg_quat
-from fly_neuromechanics.core.muscle_force_override import update_actuator_parameters, create_per_muscle_params, load_muscle_config_from_hydra
+from sphinx_training.utils.utils import change_body_frame, neg_quat
+
+
 from .env_utils import _scale_body_tree, _recolour_tree, dm_scale_spec
 from .constants import *
 
@@ -65,7 +66,6 @@ class FruitflyEnv(mjx_env.MjxEnv):
         self._compiled = False
         self._enable_flight = config.enable_flight
         self._enable_wbpg = getattr(config, 'enable_wbpg', True)
-        self._muscle_cfg = config._muscle_cfg if hasattr(config, '_muscle_cfg') else None
 
 
     def filter_model_to_t1_only(self, spec: Optional[mujoco.MjSpec] = None, xml_path: Optional[str] = None):
@@ -163,17 +163,6 @@ class FruitflyEnv(mjx_env.MjxEnv):
         if only_T1:
             fly = self.filter_model_to_t1_only(spec=fly)
 
-        # a) Convert motors to torque‑mode if requested
-        # if torque_actuators and hasattr(fly, "actuator"):
-        #     logging.info("Converting to torque actuators")
-        #     for actuator in fly.actuators:  # type: ignore[attr-defined]
-        #         # Set gain to max force; remove bias terms if present
-        #         if actuator.forcerange.size >= 2:
-        #             actuator.gainprm[0] = actuator.forcerange[1]
-        #         # reset custom bias terms
-        #         actuator.biastype = mujoco.mjtBias.mjBIAS_NONE
-        #         actuator.biasprm = np.zeros((10, 1))
-
         if rescale_factor != 1.0:
             logging.info(f"Rescaling body tree with scale factor {rescale_factor}")
             fly = dm_scale_spec(fly, rescale_factor)
@@ -254,72 +243,6 @@ class FruitflyEnv(mjx_env.MjxEnv):
             # new_spec = self._reset_wing_orientation(spec=new_spec, suffix=[self._suffix, suffix])
         return new_spec
     
-    # def _apply_joint_damping(self):
-    #     """Apply biologically-motivated passive joint damping scaling.
-    #     Scales leg joint damping to represent passive viscous resistance from
-    #     hemolymph, connective tissue, and cuticle deformation.
-    #     """
-    #     cfg = getattr(self, '_joint_damping_cfg', None)
-    #     if cfg is None or not getattr(cfg, 'enabled', False):
-    #         return
-    #     leg_scale = getattr(cfg, 'leg_scale', 1.0)
-    #     tibia_scale = getattr(cfg, 'tibia_scale', 1.0)
-    #     tarsal_scale = getattr(cfg, 'tarsal_scale', 1.0)
-    #     for joint in self._spec.joints:
-    #         name = joint.name
-    #         if not any(seg in name for seg in ['T1', 'T2', 'T3']):
-    #             continue
-    #         if 'tarsus' in name or 'tarsal' in name:
-    #             joint.damping *= tarsal_scale
-    #         elif 'tibia' in name:
-    #             joint.damping *= tibia_scale
-    #         else:
-    #             joint.damping *= leg_scale
-    #     print(f"Applied joint damping scaling: leg={leg_scale}x, tibia={tibia_scale}x, tarsal={tarsal_scale}x")
-
-    # def _set_muscle_dynamics(self) -> None:
-    #     """Set muscle actuator dynamics BEFORE compilation to allocate activation states.
-        
-    #     This must be called before spec.compile() because model.na (number of activation
-    #     states) is determined at compile time based on actuator dyntypes.
-    #     """
-    #     if self._muscle_cfg is None:
-    #         return
-
-    #     # Load config to check if dynamics are requested
-    #     global_params, _ = load_muscle_config_from_hydra(self._muscle_cfg)
-    #     requested_dyntype = global_params.get('dyntype', 'none')
-
-    #     if requested_dyntype == 'none':
-    #         return
-
-    #     # Map string to MuJoCo enum
-    #     dyntype_map = {
-    #         'none': mujoco.mjtDyn.mjDYN_NONE,
-    #         'integrator': mujoco.mjtDyn.mjDYN_INTEGRATOR,
-    #         'filter': mujoco.mjtDyn.mjDYN_FILTER,
-    #         'muscle': mujoco.mjtDyn.mjDYN_MUSCLE,
-    #         'user': mujoco.mjtDyn.mjDYN_USER,
-    #     }
-    #     dyntype_val = dyntype_map.get(requested_dyntype, mujoco.mjtDyn.mjDYN_NONE)
-
-    #     # Set dyntype and dynprm on spec for all muscle actuators
-    #     tau_act = global_params.get('tau_act', 0.002)
-    #     tau_deact = global_params.get('tau_deact', 0.01)
-    #     smoothing = global_params.get('smoothing_width', 0.001)
-
-    #     actuator_count = 0
-    #     for actuator in self._spec.actuators:
-    #         if actuator.name.startswith('mu_'):
-    #             actuator.dyntype = dyntype_val
-    #             actuator.dynprm[0] = tau_act
-    #             actuator.dynprm[1] = tau_deact
-    #             actuator.dynprm[2] = smoothing
-    #             actuator_count += 1
-
-    #     print(f"Set dyntype={requested_dyntype} on {actuator_count} muscle actuators "
-    #           f"(tau_act={tau_act}, tau_deact={tau_deact}, smoothing={smoothing})")
-
     def compile(self, forced=False, mjx_model=False) -> None:
         """Compiles the model from the mj_spec and put models to mjx"""
         if not self._compiled or forced:
@@ -330,10 +253,7 @@ class FruitflyEnv(mjx_env.MjxEnv):
             else:
                 # self._spec = self._reset_wing_orientation(self._spec.copy(), suffix=self._suffix)
                 self._default_wing_pos = jnp.asarray(_WING_PARAMS['default_qpos'])
-
-            # if self._muscle_cfg is not None:
-            #     self._apply_joint_damping()
-            #     self._set_muscle_dynamics()
+                
             self._mj_model = self._spec.compile()
             self._mj_model.opt.timestep = self._config.sim_dt
             # Increase offscreen framebuffer size to render at higher resolutions.
@@ -341,13 +261,6 @@ class FruitflyEnv(mjx_env.MjxEnv):
             self._mj_model.vis.global_.offheight = 2160
             self._mj_model.opt.iterations = self._config.iterations
             self._mj_model.opt.ls_iterations = self._config.ls_iterations
-            if self._muscle_cfg is not None:
-                global_params, muscle_specs = load_muscle_config_from_hydra(self._muscle_cfg)
-                per_muscle = create_per_muscle_params(self._mj_model, muscle_specs, global_params)
-                has_dynamics = global_params.get('dyntype', 'none') != 'none'
-                update_actuator_parameters(self._mj_model, per_muscle, force_no_dynamics=not has_dynamics)
-                print(f"Updated muscle parameters from config {self._muscle_cfg}"
-                      f" (dynamics={'enabled' if has_dynamics else 'disabled'})")
             if mjx_model:
                 self._mjx_model = mjx.put_model(self._mj_model, impl=self._config.mujoco_impl)
             if self._enable_flight:

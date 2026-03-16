@@ -1,9 +1,0 @@
-# Simple MLP network configuration (no encoder/decoder)
-network_type: simple_mlp
-init_checkpoint_network_type: simple_mlp
-network_factory_args:
-  policy_hidden_layer_sizes: [512, 512]
-  value_hidden_layer_sizes: [512, 512, 256, 256]
-restore_checkpoint: ''
-freeze_decoder: false
-fine_tune: false

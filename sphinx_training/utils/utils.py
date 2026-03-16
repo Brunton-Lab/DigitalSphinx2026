@@ -11,7 +11,7 @@ import brax.math as brax_math
 from omegaconf import OmegaConf
 from pathlib import Path
 
-import fly_mimic.utils.io_dict_to_hdf5 as ioh5
+import sphinx_training.utils.io_dict_to_hdf5 as ioh5
 
 from typing import Sequence
 

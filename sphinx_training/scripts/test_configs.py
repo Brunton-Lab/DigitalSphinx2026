@@ -1,8 +1,8 @@
 from omegaconf import DictConfig, OmegaConf
-from fly_mimic.utils.utils import load_cfg
+from sphinx_training.utils.utils import load_cfg
 import hydra
 from pathlib import Path
-from fly_mimic.utils.path_utils import convert_dict_to_path, save_config
+from sphinx_training.utils.path_utils import convert_dict_to_path, save_config
 @hydra.main(version_base=None, config_path="../configs", config_name="config")
 def my_app(cfg: DictConfig) -> None:
     # Create directories specified in the config if they do not exist

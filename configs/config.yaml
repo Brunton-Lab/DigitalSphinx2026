@@ -11,11 +11,9 @@
 defaults:
   - _self_
   - training: ppo_basic_imitation_low_kl
-  # - training/anatomy: v2_fast_simple      # Anatomical model with all legs (T1/T2/T3), no abdomen
   - training/anatomy: v1      # Anatomical model with all legs (T1/T2/T3), no abdomen
   - connectome: C_elegans_VRNN
-  - paths: JH_hyak
-  # - dataset: imitation_walk
+  - paths: default
   - dataset: imitation_walk_anipose_data_v1
 
 # Run identification

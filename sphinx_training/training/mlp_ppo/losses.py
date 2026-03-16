@@ -100,6 +100,53 @@ def compute_gae(
     return jax.lax.stop_gradient(vs), jax.lax.stop_gradient(advantages)
 
 
+def compute_kl_to_gaussian_prior(
+    latent_mean: jnp.ndarray,
+    latent_logvar: jnp.ndarray,
+) -> jnp.ndarray:
+    """Compute KL divergence from latent distribution to standard Gaussian prior.
+
+    Computes KL(q(z|x) || p(z)) where q(z|x) = N(latent_mean, exp(latent_logvar))
+    and p(z) = N(0, I).
+
+    Args:
+        latent_mean: Mean of the latent distribution, shape [T, B, D].
+        latent_logvar: Log variance of the latent distribution, shape [T, B, D].
+
+    Returns:
+        Scalar KL divergence loss (mean over all dimensions and batch).
+    """
+    return -0.5 * jnp.mean(
+        1 + latent_logvar - jnp.square(latent_mean) - jnp.exp(latent_logvar)
+    )
+
+
+def compute_ar1_temporal_loss(
+    latent_mean: jnp.ndarray,
+    discount: jnp.ndarray,
+    truncation: jnp.ndarray,
+) -> jnp.ndarray:
+    """Compute AR(1) temporal smoothness loss for latent intentions.
+
+    Penalizes large changes between consecutive latent means. Pairs that cross
+    episode boundaries (done or truncated) are masked out.
+
+    Args:
+        latent_mean: Mean of the latent distribution, shape [T, B, D].
+        discount: Discount signal, shape [T, B]. 0 indicates episode end.
+        truncation: Truncation signal, shape [T, B]. 1 indicates truncation.
+
+    Returns:
+        Scalar L2 loss between consecutive latent means (masked and normalized).
+    """
+    z_prev = latent_mean[:-1]
+    z_curr = latent_mean[1:]
+    valid_mask = discount[:-1] * (1 - truncation[:-1])
+    l2_diff = jnp.mean(jnp.square(z_curr - z_prev), axis=-1)
+    masked_l2 = l2_diff * valid_mask
+    return jnp.sum(masked_l2) / jnp.maximum(jnp.sum(valid_mask), 1.0)
+
+
 def compute_ppo_loss(
     params: PPONetworkParams,
     normalizer_params: Any,
@@ -117,8 +164,10 @@ def compute_ppo_loss(
     normalize_advantage: bool = True,
     kl_loss: bool = False,
     mmd_loss: bool = False,
+    ar1_weight: float = 0.0,
     use_kl_schedule: bool=True,
     use_mmd_schedule: bool=True,
+    use_ar1_schedule: bool=False,
 ) -> Tuple[jnp.ndarray, types.Metrics]:
     """Computes PPO loss.
 
@@ -148,16 +197,32 @@ def compute_ppo_loss(
 
     # Put the time dimension first.
     data = jax.tree_util.tree_map(lambda x: jnp.swapaxes(x, 0, 1), data)
-    
-    # Check for NaN in input observations
-    obs_has_nan = jnp.any(jnp.isnan(data.observation))
-    
-    policy_logits, extras = policy_apply(
-        normalizer_params, params.policy, data.observation, policy_key
-    )
-    
-    # Check for NaN in policy outputs
-    logits_has_nan = jnp.any(jnp.isnan(policy_logits))
+
+    # Check for stored policy_rng for deterministic stochastic layer replay
+    policy_rng = data.extras["policy_extras"].get("policy_rng")
+
+    if policy_rng is not None:
+        # Deterministic replay: use stored per-sample RNGs so the same z is
+        # sampled as during the forward rollout (fixes KL loss inconsistency).
+        obs_leaf = jax.tree_util.tree_leaves(data.observation)[0]
+        T, B = obs_leaf.shape[:2]
+        flat_obs = jax.tree_util.tree_map(
+            lambda x: x.reshape((T * B,) + x.shape[2:]), data.observation
+        )
+        flat_rng = policy_rng.reshape((T * B, 2))
+        flat_logits, flat_extras = policy_apply(
+            normalizer_params, params.policy, flat_obs, flat_rng
+        )
+        policy_logits = flat_logits.reshape((T, B) + flat_logits.shape[1:])
+        extras = jax.tree_util.tree_map(
+            lambda x: x.reshape((T, B) + x.shape[1:]), flat_extras
+        )
+    else:
+        # Standard path: use fresh RNG
+        policy_logits, extras = policy_apply(
+            normalizer_params, params.policy, data.observation, policy_key
+        )
+
     policy_logits = jnp.nan_to_num(policy_logits, nan=0.0, posinf=10.0, neginf=-10.0)
 
     baseline = value_apply(normalizer_params, params.value, data.observation)
@@ -228,30 +293,33 @@ def compute_ppo_loss(
     entropy = jnp.clip(entropy, -1e5, 1e5)
     entropy_loss = entropy_cost * -entropy
 
-    # KL Divergence for latent layer
+    # KL Divergence and AR1 temporal smoothness for latent layer
     if kl_loss:
-        # Make sure your network extras have these values
         latent_mean = extras["latent_mean"]
         latent_logvar = extras["latent_logvar"]
-        
-        # Clip logvar to prevent exp() overflow
+
+        # Clip to prevent exp() overflow
         latent_logvar = jnp.clip(latent_logvar, -100.0, 100.0)
-        latent_mean = jnp.clip(latent_mean, -100.0, 100.0)
-        
-        if use_kl_schedule:
-            weight = kl_weight(step)
-        else:
-            weight = kl_weight
-        
-        kl_divergence = -0.5 * jnp.mean(
-            1 + latent_logvar - jnp.square(latent_mean) - jnp.exp(latent_logvar)
-        )
-        # Clip KL to prevent explosion
+        latent_mean_clipped = jnp.clip(latent_mean, -100.0, 100.0)
+
+        current_kl_weight = kl_weight(step) if use_kl_schedule else kl_weight
+        current_ar1_weight = ar1_weight(step) if use_ar1_schedule else ar1_weight
+
+        # KL divergence to standard Gaussian prior N(0, I)
+        kl_divergence = compute_kl_to_gaussian_prior(latent_mean_clipped, latent_logvar)
         kl_divergence = jnp.clip(kl_divergence, 0.0, 1e5)
-        kl_latent_loss = weight * kl_divergence
+
+        # AR1 temporal smoothness loss on latent means
+        ar1_loss_val = compute_ar1_temporal_loss(latent_mean, data.discount, truncation)
+        ar1_loss_val = jnp.clip(ar1_loss_val, 0.0, 1e5)
+
+        kl_latent_loss = current_kl_weight * kl_divergence + current_ar1_weight * ar1_loss_val
     else:
         kl_latent_loss = 0
-        weight = 0
+        current_kl_weight = 0
+        current_ar1_weight = 0
+        kl_divergence = 0
+        ar1_loss_val = 0
     # MMD loss
     if mmd_loss:
         z = extras['z']
@@ -281,9 +349,12 @@ def compute_ppo_loss(
         "policy_loss": policy_loss,
         "v_loss": v_loss,
         "kl_latent_loss": kl_latent_loss,
+        "kl_divergence": kl_divergence,
+        "ar1_loss": ar1_loss_val,
         "mmd_loss": mmd_loss_val,
         "entropy_loss": entropy_loss,
-        "KL_weight": weight
+        "kl_weight": current_kl_weight,
+        "ar1_weight": current_ar1_weight,
     }
 
 

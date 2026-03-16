@@ -22,7 +22,7 @@ except ImportError:
     pass
 
 # Note: brax_to_onnx is NOT imported by default to avoid TensorFlow overhead
-# Import explicitly when needed: from fly_mimic import brax_to_onnx
+# Import explicitly when needed: from sphinx_training import brax_to_onnx
 # try:
 #     from . import brax_to_onnx
 # except (ImportError, AttributeError):

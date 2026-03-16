@@ -2,20 +2,17 @@
 user: eabe
 
 # Base directories
-project_dir: "/home/${paths.user}/Research/MyRepos/fly_neuromech"
-base_dir: "/data2/users/${paths.user}/fly_neuromech/${version}"
+project_dir: "/home/${paths.user}/Research/MyRepos/TheSphinx2026"
+base_dir: "/data2/users/${paths.user}/TheSphinx/${version}"
 save_dir: ${multirun_save_dir:${paths.base_dir},${run_id}}
 log_dir:  "${paths.save_dir}/logs/"
 ckpt_dir: "${paths.save_dir}/ckpt/"
 fig_dir:  "${paths.save_dir}/figures/"
-data_dir: "/data2/users/${paths.user}/fly_neuromech/data"
+data_dir: "/data2/users/${paths.user}/TheSphinx/data"
 
 # Submodule paths (relative to project_dir)
-fly_mimic_dir: "${paths.project_dir}/fly_mimic"
-body_models_dir: "${paths.project_dir}/fruitfly_body_models"
+fly_mimic_dir: "${paths.project_dir}/sphinx_training"
+body_models_dir: "${paths.project_dir}/sphinx_training/fruitfly_body_models"
 
 # vnc_sims data paths
-vnc_data_dir: "${paths.data_dir}/BANC"
-
-# fly_mimic data paths
-rl_data_dir: "${paths.data_dir}/datasets"
+connectome_data_dir: "${paths.project_dir}/data/connectome/C_elegans"

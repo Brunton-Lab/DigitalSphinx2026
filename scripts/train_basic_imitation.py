@@ -14,9 +14,9 @@ os.environ["XLA_FLAGS"] = "--xla_gpu_triton_gemm_any=True "
 repo_root = Path(__file__).parent.parent
 sys.path.insert(0, str(repo_root))
 
-# Add fly_mimic submodule to path
-fly_mimic_path = repo_root / 'fly_mimic'
-sys.path.insert(0, str(fly_mimic_path))
+# Add sphinx_training to path
+sphinx_training_path = repo_root / 'sphinx_training'
+sys.path.insert(0, str(sphinx_training_path))
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -36,9 +36,9 @@ from mujoco_playground import wrapper
 
 num_gpus = jax.device_count(backend="gpu")
 
-from utils.path_utils import register_custom_resolvers, convert_dict_to_path, convert_dict_to_string
 
-# Import fly_mimic components
+# Import sphinx_training components
+from sphinx_training.utils.path_utils import register_custom_resolvers, convert_dict_to_path, convert_dict_to_string
 from sphinx_training.training.mlp_ppo import mlp_ppo
 from sphinx_training.training.mlp_ppo import ppo_networks
 from sphinx_training.utils.data_utils import HDF5ReferenceClips
@@ -46,10 +46,8 @@ from sphinx_training.utils.fly_logging import log_eval_rollout
 
 # Import basic environments
 from sphinx_training.envs.fruitfly import imitation
-from sphinx_training.envs.fruitfly import imitation_unified
+from sphinx_training.envs.fruitfly import state_generator_env
 
-# Import neuromechanics support for muscle patching
-from fly_neuromechanics.core import support
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 register_custom_resolvers()
@@ -75,13 +73,10 @@ def make_basic_environment(cfg: DictConfig):
     train_clips_loaded = train_clips.load_all_clips()
     test_clips_loaded = test_clips.load_all_clips()
     
-    # Create environment based on dataset name
-    if "unified" in cfg.dataset.env_name:
-        env = imitation_unified.ImitationUnified(cfg, reference_clips=train_clips_loaded)
-        env_type = "ImitationUnified (adaptive walk/flight control)"
-    else:
-        env = imitation.Imitation(cfg, reference_clips=train_clips_loaded)
-        env_type = "Imitation (direct actuator control)"
+    # Create environment
+    env = imitation.Imitation(cfg, reference_clips=train_clips_loaded)
+    env = state_generator_env.LatentStateWrapper(cfg, jax.random.PRNGKey(0), env, state_generator_env.Obs_Adapter())
+    env_type = "Imitation (direct actuator control)"
     
     # Calculate episode length using fly_mimic formula
     episode_length = (
@@ -176,11 +171,7 @@ def main(cfg: DictConfig):
     if restore_checkpoint:
         print(f"Restore checkpoint: {restore_checkpoint}")
     print(f"{'='*70}\n")
-    
-    # Patch MJX for custom muscles
-    support.patch_mjx_muscle_functions(enable=True)
-    print("✓ MJX muscle functions patched")
-    
+        
     # Create environment
     train_env, test_clips, episode_length = make_basic_environment(cfg)
     

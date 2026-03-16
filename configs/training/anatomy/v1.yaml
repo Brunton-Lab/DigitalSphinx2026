@@ -1,7 +1,7 @@
 # @package dataset.env_args
 # Anatomical structure for FruitflyV1 model
-mjcf_path: "${paths.project_dir}/fruitfly_body_models/fruitfly_v1/fruitfly_v1.xml" 
-arena_path: "${paths.project_dir}/fruitfly_body_models/fruitfly_v1/floor.xml" 
+mjcf_path: "${paths.body_models_dir}/fruitfly_v1/fruitfly_v1.xml"
+arena_path: "${paths.body_models_dir}/fruitfly_v1/floor.xml"
 
 end_eff_names:
   # V1 uses "claw" not "tarsal_claw"

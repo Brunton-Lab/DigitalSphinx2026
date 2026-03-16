@@ -4,7 +4,7 @@ import mujoco
 import os
 import numpy as np
 import imageio
-from fly_mimic.utils.utils import add_trajectory_sites_spheres, add_cross_hair_sites
+from sphinx_training.utils.utils import add_trajectory_sites_spheres, add_cross_hair_sites
 
 def log_eval_rollout(cfg, rollout, state, env, reference_clip, model_path, num_steps, EVAL_STEPS=0):
     '''Log the rollout to wandb'''

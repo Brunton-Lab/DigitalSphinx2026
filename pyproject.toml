@@ -1,0 +1,119 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sphinx-training"
+version = "0.1.0"
+description = "Integrated neuromechanical simulation for Drosophila combining neural VNC dynamics with physics-based body models"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Elliott Abe", email = "eabe@uw.edu"}
+]
+keywords = ["neuroscience", "biomechanics", "drosophila", "simulation", "jax"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+
+dependencies = [
+    # JAX ecosystem
+    "jax>=0.4.0",
+    "jaxlib>=0.4.0",
+
+    # Core scientific computing
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "h5py>=3.8",
+    "pandas>=2.0",
+
+    # Physics simulation
+    "mujoco>=3.2.0",
+    "mujoco-mjx>=3.2.0",
+    "dm-control",
+    "brax>=0.9.0",
+    "playground",
+
+    # ML / training
+    "flax",
+    "optax",
+    "orbax-checkpoint>=0.11",
+
+    # Configuration
+    "hydra-core>=1.3",
+    "omegaconf>=2.3",
+    "ml_collections",
+
+    # Visualization
+    "matplotlib>=3.7",
+    "seaborn",
+    "mediapy",
+    "imageio",
+    "opencv-python",
+    "pillow",
+
+    # Logging & monitoring
+    "wandb",
+
+    # Utilities
+    "tqdm",
+    "psutil",
+    "pyyaml",
+    "absl-py",
+    "etils",
+    "natsort",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "jax[cuda12]>=0.4.0",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "black>=23.0",
+    "mypy>=1.0",
+    "flake8>=6.0",
+    "ipython",
+    "jupyter",
+]
+
+[project.urls]
+Homepage = "https://github.com/Brunton-Lab/fly_neuromech"
+Repository = "https://github.com/Brunton-Lab/fly_neuromech.git"
+
+[tool.setuptools]
+packages = ["sphinx_training"]
+
+[tool.setuptools.package-data]
+sphinx_training = [
+    "py.typed",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --cov=sphinx_training --cov-report=term-missing"
+
+[tool.uv]
+# GPU install:  uv sync --extra gpu
+# CPU install:  uv sync

@@ -13,13 +13,19 @@ import mujoco
 from ml_collections import config_dict
 from mujoco import mjx
 from mujoco_playground._src import mjx_env
-from fly_mimic.utils.data_utils import ReferenceClips, HDF5ReferenceClips
-from fly_mimic.utils.utils import add_cross_hair_sites, add_trajectory_sites_spheres
+from sphinx_training.utils.data_utils import ReferenceClips, HDF5ReferenceClips
+from sphinx_training.utils.utils import add_cross_hair_sites, add_trajectory_sites_spheres
 from . import base as fruitfly_base
 from .constants import *
-from fly_mimic.envs.quasi_aero import compute_apply_all_fluid_forces_to_state
-from fly_mimic.envs.ellipsoid_fluid import compute_apply_ellipsoid_fluid_forces
-from fly_mimic.envs.pattern_generators_new import JITWingBeatPatternGenerator
+
+try:
+    from sphinx_training.envs.quasi_aero import compute_apply_all_fluid_forces_to_state
+    from sphinx_training.envs.ellipsoid_fluid import compute_apply_ellipsoid_fluid_forces
+    from sphinx_training.envs.pattern_generators_new import JITWingBeatPatternGenerator
+except ImportError:
+    compute_apply_all_fluid_forces_to_state = None
+    compute_apply_ellipsoid_fluid_forces = None
+    JITWingBeatPatternGenerator = None
 
 _REWARD_FCN_REGISTRY: dict[str, Callable] = {}
 _TERMINATION_FCN_REGISTRY: dict[str, Callable] = {}
@@ -74,9 +80,6 @@ class Imitation(fruitfly_base.FruitflyEnv):
         config.rescale_factor = 1.0
         config.torque_actuators = True
         config.mujoco_impl = env_args.mujoco_impl
-        # TODO remove cmt - this is only so that i can open a Fly_tracking agent
-        # if cfg.muscles is not None: 
-        #     config._muscle_cfg = cfg.muscles
         super().__init__(config, config_overrides)
         # Flight-specific parameters
         if self._enable_flight:

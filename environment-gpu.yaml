@@ -1,0 +1,73 @@
+# Sphinx Training - GPU Environment
+#
+# Install with: conda env create -f environment-gpu.yaml
+# Activate with: conda activate sphinx
+#
+# Requires CUDA-compatible GPU
+# For CPU-only installation, use environment-cpu.yaml instead
+
+name: sphinx
+channels:
+  - conda-forge
+  - nvidia
+  - defaults
+
+dependencies:
+  # Python
+  - python=3.12
+
+  # Core scientific computing
+  - numpy>=1.24
+  - scipy>=1.10
+  - matplotlib>=3.7
+  - seaborn
+  - pandas>=2.0
+  - h5py>=3.8
+
+  # Configuration management
+  - hydra-core>=1.3
+  - omegaconf>=2.3
+  - pyyaml
+
+  # Utilities
+  - tqdm
+  - psutil
+  - pillow
+  - natsort
+
+  # Install pip packages
+  - pip
+  - pip:
+      # JAX (GPU)
+      - jax[cuda12]>=0.4.0
+
+      # ML / training
+      - flax
+      - optax
+      - orbax-checkpoint>=0.11
+
+      # MuJoCo and physics simulation
+      - mujoco>=3.2.0
+      - mujoco-mjx>=3.2.0
+      - dm-control
+      - brax>=0.9.0
+      - playground
+
+      # Configuration
+      - ml_collections
+
+      # Visualization & media
+      - mediapy
+      - imageio
+      - opencv-python
+
+      # Logging
+      - wandb
+
+      # Utilities
+      - absl-py
+      - etils
+
+      # Install local package in editable mode
+      # Run after environment creation:
+      #   pip install -e .

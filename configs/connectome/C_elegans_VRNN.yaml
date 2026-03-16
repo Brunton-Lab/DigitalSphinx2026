@@ -1,6 +1,6 @@
-rnn_weights: ${paths.project_dir}/fly_mimic/training/connectome/C.elegans/W_hh_123025.npy  # path to RNN weights; 'random' for random init
-motor_neuron_indices: ${paths.project_dir}/fly_mimic/training/connectome/C.elegans/motor_head_motor_command_neuron_indices.txt  # path to neuron indices that output to actor policy
-sensory_neuron_indices: ${paths.project_dir}/fly_mimic/training/connectome/C.elegans/sensory_neuron_indices.txt  # path to sensory neuron indices
+rnn_weights: ${paths.connectome_data_dir}/W_hh_123025.npy  # path to RNN weights; 'random' for random init
+motor_neuron_indices: ${paths.connectome_data_dir}/motor_head_motor_command_neuron_indices.txt  # path to neuron indices that output to actor policy
+sensory_neuron_indices: ${paths.connectome_data_dir}/sensory_neuron_indices.txt  # path to sensory neuron indices
 sensory_nonlinearity: tanh  # nonlinearity to apply to sensory inputs before feeding into RNN - prevents large inputs
 norm_eigen_target: 0.95  # normalize RNN weights to have max eigenvalue of this value 
 rec_nonlinearity: tanh 

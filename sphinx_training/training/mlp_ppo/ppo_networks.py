@@ -64,6 +64,7 @@ def make_inference_fn(ppo_networks: PPONetworks):
                 "log_prob": log_prob,
                 "raw_action": raw_actions,
                 "logits": logits,
+                "policy_rng": key_network,
             }
 
         return policy
