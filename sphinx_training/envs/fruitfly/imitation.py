@@ -103,7 +103,13 @@ class Imitation(fruitfly_base.FruitflyEnv):
 
             # When joint filtering is active, slice reference qpos/qvel to match
             # the sim model's joint layout so the same indices work for both.
-            if getattr(self._config, 'filter_joints', False) and hdf5_clips.qpos_names is not None:
+            if getattr(self._config, 'filter_joints', False):
+                if hdf5_clips.qpos_names is None:
+                    raise ValueError(
+                        "filter_joints=True requires the HDF5 dataset to contain a "
+                        "'qpos_names' field so joints can be matched by name. "
+                        f"Dataset: {cfg.paths.data_dir / f'datasets/{cfg.dataset.clip_idx}'}"
+                    )
                 clips = clips.slice_to_joints(self._config.joint_names, hdf5_clips.qpos_names)
 
             self.reference_clips = clips
