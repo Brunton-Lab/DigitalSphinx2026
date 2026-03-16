@@ -58,7 +58,7 @@ dependencies:
 
       # Visualization & media
       - mediapy
-      - imageio
+      - imageio[ffmpeg]
       - opencv-python
 
       # Logging

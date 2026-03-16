@@ -10,14 +10,14 @@ train_setup:
   wandb_project: "fly_neuromechanics"
   algo_name: ppo
   num_timesteps: 10_000_000_000
-  eval_every: 100_000_000
+  eval_every: 50_000_000
   reset_every: 25_000_000
   mb_per_env: 21.4
 
 # PPO algorithm parameters
 train_args:
   seed: ${seed}
-  num_envs: 2048
+  num_envs: 4096
   batch_size: 512
   reward_scaling: 1
   normalize_observations: true
