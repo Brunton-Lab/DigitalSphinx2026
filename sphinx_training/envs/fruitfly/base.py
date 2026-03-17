@@ -94,10 +94,11 @@ class FruitflyEnv(mjx_env.MjxEnv):
         allowed_joints = set(self._config.joint_names)
 
         # --- Joints ---
+        # Always keep free (root) joints so the body can move in the world.
         joints_to_delete = []
         for body in spec.bodies:
             for joint in body.joints:
-                if joint.name not in allowed_joints:
+                if joint.name not in allowed_joints and joint.type != mujoco.mjtJoint.mjJNT_FREE:
                     joints_to_delete.append(joint)
 
         # --- Actuators (names match joint names in this model) ---

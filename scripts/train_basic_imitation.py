@@ -72,7 +72,18 @@ def make_basic_environment(cfg: DictConfig):
     # Load clips into memory (required for JAX tracing)
     train_clips_loaded = train_clips.load_all_clips()
     test_clips_loaded = test_clips.load_all_clips()
-    
+
+    # When joint filtering is active, slice reference qpos/qvel to match the sim model.
+    if getattr(cfg.dataset.env_args, 'filter_joints', False):
+        if ref_clips.qpos_names is None:
+            raise ValueError(
+                "filter_joints=True requires the HDF5 dataset to contain a "
+                "'qpos_names' field so joints can be matched by name."
+            )
+        joint_names = list(cfg.dataset.env_args.joint_names)
+        train_clips_loaded = train_clips_loaded.slice_to_joints(joint_names, ref_clips.qpos_names)
+        test_clips_loaded = test_clips_loaded.slice_to_joints(joint_names, ref_clips.qpos_names)
+
     # Create environment
     env = imitation.Imitation(cfg, reference_clips=train_clips_loaded)
     env = state_generator_env.LatentStateWrapper(cfg, jax.random.PRNGKey(0), env, state_generator_env.Obs_Adapter())
