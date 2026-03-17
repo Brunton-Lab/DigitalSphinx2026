@@ -9,6 +9,7 @@ os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
 os.environ["MUJOCO_GL"] = "egl"
 os.environ["PYOPENGL_PLATFORM"] = "egl"
 os.environ["XLA_FLAGS"] = "--xla_gpu_triton_gemm_any=True "
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # suppress XLA/TF C++ logs
 
 # Add fly_neuromechanics to path
 repo_root = Path(__file__).parent.parent
