@@ -33,29 +33,29 @@ env_args:
       weight: 1.0
       exp_scale: 4.0
     root_ang_vel:
-      weight: 0.0
+      weight: 0.5
       exp_scale: 0.075
     joints:
       weight: 1.0
       exp_scale: 0.25
     joints_vel:
-      weight: 0.0
+      weight: 0.5
       exp_scale: 0.001
     bodies_pos:
-      weight: 0.0
+      weight: 0.5
       exp_scale: 8.0
     end_eff:
       weight: 1.0
       exp_scale: 100.0
     thorax_z_range:
-      weight: 0.0
+      weight: 0.5
       healthy_z_range: [-0.03, 0.1]
     last_frame_reward:
       weight: 10.0
     control_cost:
       weight: 0.02
     control_diff_cost:
-      weight: 0.1
+      weight: 0.5
     energy_cost:
       max_value: 50.0
       weight: 0.001

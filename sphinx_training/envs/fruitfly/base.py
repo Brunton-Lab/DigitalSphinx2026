@@ -20,6 +20,23 @@ from .env_utils import _scale_body_tree, _recolour_tree, dm_scale_spec
 from .constants import *
 
 
+def _axis_angle_to_quat(axis, angle):
+    """Returns unit quaternion [w, x, y, z] for rotation of `angle` rad about `axis`."""
+    s = np.sin(angle / 2.0)
+    return np.array([np.cos(angle / 2.0), axis[0]*s, axis[1]*s, axis[2]*s])
+
+
+def _quat_mul(q1, q2):
+    """Hamilton product of two [w,x,y,z] quaternions."""
+    w1, x1, y1, z1 = q1;  w2, x2, y2, z2 = q2
+    return np.array([
+        w1*w2 - x1*x2 - y1*y2 - z1*z2,
+        w1*x2 + x1*w2 + y1*z2 - z1*y2,
+        w1*y2 - x1*z2 + y1*w2 + z1*x2,
+        w1*z2 + x1*y2 - y1*x2 + z1*w2,
+    ])
+
+
 def get_assets(xml_paths) -> Dict[str, bytes]:
     assets = {}
     mjx_env.update_assets(assets, xml_paths, "*.xml")
@@ -92,6 +109,20 @@ class FruitflyEnv(mjx_env.MjxEnv):
             spec = mujoco.MjSpec.from_file(path)
 
         allowed_joints = set(self._config.joint_names)
+
+        # Bake default wing joint angles into the body quat before the joints are deleted.
+        # Wing joints: yaw (axis z), roll (axis x), pitch (axis y) in that order.
+        _wing_axes = [[0, 0, 1], [1, 0, 0], [0, 1, 0]]
+        _wing_defaults = _WING_PARAMS['default_qpos']  # [yaw_L, roll_L, pitch_L, yaw_R, roll_R, pitch_R]
+        for side_idx, body_name in enumerate(['wing_left', 'wing_right']):
+            try:
+                body = spec.body(body_name)
+            except Exception:
+                continue
+            q = np.array(body.quat, dtype=float)
+            for axis, angle in zip(_wing_axes, _wing_defaults[side_idx*3 : side_idx*3+3]):
+                q = _quat_mul(q, _axis_angle_to_quat(axis, angle))
+            body.quat = (q / np.linalg.norm(q)).tolist()
 
         # --- Joints ---
         # Always keep free (root) joints so the body can move in the world.

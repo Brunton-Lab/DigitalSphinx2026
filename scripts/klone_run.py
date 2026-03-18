@@ -168,6 +168,7 @@ python scripts/slurm-run_ckpt_all.py --partition=gpu-l40s --dataset=fly_multicli
 #### wandb regex: ^(?!.*table)(?!.*std).*$|^reward*&
 
 python ./scripts/klone_run.py --partition=ckpt-g2 --num_gpus=8 --script_name=train_basic_imitation --override='train_args.num_envs=4096'
+python ./scripts/klone_run.py --partition=ckpt-g2 --num_gpus=8 --script_name=train_basic_imitation --override='training/network=intention_ws train_args.num_envs=4096'
 
 
 '''
