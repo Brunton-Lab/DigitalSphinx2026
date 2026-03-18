@@ -15,7 +15,6 @@ end_eff_names:
 body_names:
   # V1 uses "tarsus" not "tarsus1", same trochanter structure
   - coxa_T1_left
-  - trochanter_T1_left
   - femur_T1_left
   - tibia_T1_left
   - tarsus_T1_left
