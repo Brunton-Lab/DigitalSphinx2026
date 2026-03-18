@@ -9,16 +9,6 @@ Animal intelligence is not purely a product of abstract computation in the brain
 
 ## Installation
 
-### uv (recommended)
-
-```bash
-# CPU only
-uv sync
-
-# GPU (CUDA 12)
-uv sync --extra gpu
-```
-
 ### Conda / Mamba
 
 ```bash
@@ -29,6 +19,16 @@ conda activate sphinx
 # CPU only
 conda env create -f environment-cpu.yaml
 conda activate sphinx-cpu
+```
+
+### uv 
+
+```bash
+# CPU only
+uv sync
+
+# GPU (CUDA 12)
+uv sync --extra gpu
 ```
 
 ### pip
