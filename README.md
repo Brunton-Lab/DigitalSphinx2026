@@ -124,18 +124,6 @@ The `configs/paths/` directory contains environment-specific path configs so the
 
 Switch environments by overriding the `paths` group: `paths=hyak`.
 
-### Custom Resolvers
-
-The project registers custom OmegaConf resolvers (in `sphinx_training/utils/path_utils.py`) that can be used in YAML configs:
-
-| Resolver | Description |
-|----------|-------------|
-| `${multirun_save_dir:base,run_id}` | Generates save directories aware of Hydra multirun |
-| `${eq:a,b}` | Case-insensitive string equality check |
-| `${divide:x,y}` | Integer division |
-| `${contains:x,y}` | Case-insensitive substring check |
-| `${resolve_default:default,arg}` | Returns `default` if `arg` is empty, otherwise `arg` |
-
 ## License
 
 GPL
