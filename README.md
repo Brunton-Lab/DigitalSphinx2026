@@ -4,7 +4,8 @@
 Bingni W. Brunton\*, Elliott T.T. Abe\*, Lawrence Jianqiao Hu, and John C. Tuthill. biorxiv, 2026. doi: 10.64898/2026.03.20.713233  
 \* These authors contributed equally to this work
 
-[Video](https://www.youtube.com/watch?v=3KBZ6nrZxDY)
+[Video](https://www.youtube.com/watch?v=3KBZ6nrZxDY)  
+
 https://github.com/user-attachments/assets/3c287457-d2f2-438e-b359-30728bbd5d06
 
 
