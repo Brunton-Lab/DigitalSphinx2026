@@ -6,7 +6,10 @@ Bingni W. Brunton\*, Elliott T.T. Abe\*, Lawrence Jianqiao Hu, and John C. Tuthi
 
 [Video](https://www.youtube.com/watch?v=3KBZ6nrZxDY)  
 
-<video width="630" height="300" src="https://github.com/user-attachments/assets/9db2a03f-3459-404b-9bad-1625f4926f26"></video>
+<video width="630" height="300" src="https://github.com/user-attachments/assets/9ecb922c-bf65-4e2c-904d-744e5a7c69e0"></video>
+
+
+
 
 
 
