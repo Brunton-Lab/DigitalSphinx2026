@@ -1,20 +1,43 @@
 cff-version: 1.2.0
-message: "The digital sphinx: Can a worm brain control a fly body?"
-authors:
-- family-names: "Brunton"
-  given-names: "Bingni W."
-  orcid: "https://orcid.org/0000-0002-4831-3466
-- family-names: "Abe"
-  given-names: "Elliott T. T."
-  orcid: "https://orcid.org/0000-0002-5305-2467"
-- family-names: "Hu"
-  given-names: "Lawrence Jianqiao"
-  orcid: "https://orcid.org/0009-0008-2010-5666"
-- family-names: "John"
-  given-names: "Tuthill C"
-  orcid: "https://orcid.org/0000-0002-5689-5806"
+message: "If you use this software, please cite it using the metadata below."
 title: "DigitalSphinx2026"
-version: 1.0.0
-doi: 10.64898/2026.03.20.713233 
+version: "1.0.0"
 date-released: 2026-03-24
+doi: "10.64898/2026.03.20.713233"
 url: "https://github.com/Brunton-Lab/DigitalSphinx2026"
+note: "Bingni W. Brunton and Elliott T. T. Abe contributed equally to this work."
+authors:
+  - family-names: "Brunton"
+    given-names: "Bingni W."
+    orcid: "https://orcid.org/0000-0002-4831-3466"
+  - family-names: "Abe"
+    given-names: "Elliott T. T."
+    orcid: "https://orcid.org/0000-0002-5305-2467"
+  - family-names: "Hu"
+    given-names: "Lawrence Jianqiao"
+    orcid: "https://orcid.org/0009-0008-2010-5666"
+  - family-names: "Tuthill"
+    given-names: "John C."
+    orcid: "https://orcid.org/0000-0002-5689-5806"
+preferred-citation:
+  type: article
+  title: "The digital sphinx: Can a worm brain control a fly body?"
+  authors:
+    - family-names: "Brunton"
+      given-names: "Bingni W."
+      orcid: "https://orcid.org/0000-0002-4831-3466"
+    - family-names: "Abe"
+      given-names: "Elliott T. T."
+      orcid: "https://orcid.org/0000-0002-5305-2467"
+    - family-names: "Hu"
+      given-names: "Lawrence Jianqiao"
+      orcid: "https://orcid.org/0009-0008-2010-5666"
+    - family-names: "Tuthill"
+      given-names: "John C."
+      orcid: "https://orcid.org/0000-0002-5689-5806"
+  doi: "10.64898/2026.03.20.713233"
+  date-published: 2026-03-20
+  url: "https://www.biorxiv.org/content/10.64898/2026.03.20.713233v1"
+  journal: "bioRxiv"
+  year: 2026
+  note: "Bingni W. Brunton and Elliott T. T. Abe contributed equally to this work."
