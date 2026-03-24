@@ -1,6 +1,6 @@
 # DigitalSphinx2026 Repo
 
-<ins>**The digital sphinx: Can a worm brain control a fly body?**</ins>  
+[<ins>**The digital sphinx: Can a worm brain control a fly body?**</ins>](https://www.biorxiv.org/cgi/content/short/2026.03.20.713233v1)  
 Bingni W. Brunton\*, Elliott T.T. Abe\*, Lawrence Jianqiao Hu, and John C. Tuthill  
 \* These authors contributed equally to this work
 
