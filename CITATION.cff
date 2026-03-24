@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "The digital sphinx: Can a worm brain control a fly body?"
+authors:
+- family-names: "Brunton"
+  given-names: "Bingni W."
+  orcid: "https://orcid.org/0000-0002-4831-3466
+- family-names: "Abe"
+  given-names: "Elliott T. T."
+  orcid: "https://orcid.org/0000-0002-5305-2467"
+- family-names: "Hu"
+  given-names: "Lawrence Jianqiao"
+  orcid: "https://orcid.org/0009-0008-2010-5666"
+- family-names: "John"
+  given-names: "Tuthill C"
+  orcid: "https://orcid.org/0000-0002-5689-5806"
+title: "DigitalSphinx2026"
+version: 1.0.0
+doi: 10.64898/2026.03.20.713233 
+date-released: 2026-03-24
+url: "https://github.com/Brunton-Lab/DigitalSphinx2026"
