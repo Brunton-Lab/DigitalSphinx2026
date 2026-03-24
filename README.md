@@ -6,9 +6,10 @@ Bingni W. Brunton\*, Elliott T.T. Abe\*, Lawrence Jianqiao Hu, and John C. Tuthi
 
 [Video](https://www.youtube.com/watch?v=3KBZ6nrZxDY)  
 
-<video width="630" height="300" src="https://github.com/user-attachments/assets/9ecb922c-bf65-4e2c-904d-744e5a7c69e0" autoplay loop muted playsinline></video>
 
-<iframe width="973" height="433" src="https://www.youtube.com/embed/3KBZ6nrZxDY" title="The digital sphinx: Can a worm brain control a fly body?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<video width="630" height="300" src="https://github.com/user-attachments/assets/66840ff4-9779-43ce-99e8-61cdfb8b26c1" autoplay loop muted playsinline></video>
+
+
 
 ## Abstract
 Animal intelligence is not purely a product of abstract computation in the brain, but emerges from dynamic interactions between the nervous system and the body. New connectome datasets and musculoskeletal models now enable integrated, closed-loop simulations of the neural and biomechanical systems of the fruit fly Drosophila, an ideal model organism to investigate embodied intelligence. However, many biological parameters of the nervous system and the body, as well as how they interface, remain unknown. To fill such gaps, researchers are turning to deep reinforcement learning (DRL), a data-driven optimization framework, to create virtual animals that imitate the behavior of real animals. Here, we provide a cautionary tale about the interpretation of such models. We constructed a virtual chimera of two phylogenetically distant species: a connectome of the C. elegans nematode worm and a biomechanical model of the fly body. The worm connectome receives sensory information from the fly body, and an artificial neural network is trained with DRL to map worm motor neuron activations to the fly’s leg actuators. The resulting digital sphinx produces highly realistic fly walking—yet it is biologically meaningless. This exercise teaches us nothing about either animal and exposes a core peril of connectome-body models: behavioral fidelity is achievable without biological fidelity, making such models easy to overinterpret. Done carefully, virtual animals can be powerful partners to biological experiments, but only if their components and interfaces are grounded in biology.
