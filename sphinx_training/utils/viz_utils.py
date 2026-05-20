@@ -251,5 +251,66 @@ def extract_and_convert_single_trajectory(rollout_pair, model_pair, env_idx=0):
         mjdata_trajectory[t].qpos[:] = qpos_batch[t]
         mjdata_trajectory[t].qvel[:] = qvel_batch[t]
         mujoco.mj_forward(model_pair, mjdata_trajectory[t])
-    
+
     return mjdata_trajectory
+
+
+def build_filtered_fly_spec(
+    fly_xml: str,
+    joint_names: Sequence[str],
+    *,
+    bake_wing_defaults: bool = True,
+    verbose: bool = True,
+) -> mujoco.MjSpec:
+    """Load the fruitfly MjSpec and filter it to match the imitation env.
+
+    Mirrors what ``Imitation.add_fly(filter_joints=True)`` does at training
+    time so that saved rollouts (which were produced against the filtered
+    model) can be rendered without dimension mismatches: deletes joints,
+    actuators, tendons, and sensors that are not tied to ``joint_names``,
+    optionally pre-rotating the wing bodies into their default stroke-plane
+    pose so the wings still look right after their joints are removed.
+
+    Args:
+        fly_xml: Path to the fly body XML (e.g. ``fruitfly_v1.xml``).
+        joint_names: Joints to keep. Should match
+            ``cfg.dataset.env_args.joint_names``.
+        bake_wing_defaults: If True, rotate ``wing_left``/``wing_right``
+            bodies by ``_WING_PARAMS['default_qpos']`` before deletion so
+            the visual pose matches the imitation env's reset.
+        verbose: Forwarded to ``filter_model_to_config_joints``.
+
+    Returns:
+        The filtered ``MjSpec``. Compile it (or pass it to
+        ``mujoco_visualizer.Visualizer(spec=...)``) to use it.
+    """
+    from mujoco_visualizer.model_utils import filter_model_to_config_joints
+    from sphinx_training.envs.fruitfly.base import _axis_angle_to_quat, _quat_mul
+    from sphinx_training.envs.fruitfly.constants import _WING_PARAMS
+
+    spec = mujoco.MjSpec.from_file(str(fly_xml))
+
+    if bake_wing_defaults:
+        # Wing joints: yaw (z), roll (x), pitch (y). Bake the default
+        # qpos into the body quat so the wing visually sits in its
+        # stroke-plane position once its joints are gone.
+        _wing_axes = [[0, 0, 1], [1, 0, 0], [0, 1, 0]]
+        _wing_defaults = _WING_PARAMS["default_qpos"]
+        for side_idx, body_name in enumerate(("wing_left", "wing_right")):
+            try:
+                body = spec.body(body_name)
+            except Exception:
+                continue
+            q = np.array(body.quat, dtype=float)
+            for axis, angle in zip(
+                _wing_axes,
+                _wing_defaults[side_idx * 3 : side_idx * 3 + 3],
+            ):
+                q = _quat_mul(q, _axis_angle_to_quat(axis, angle))
+            body.quat = (q / np.linalg.norm(q)).tolist()
+
+    return filter_model_to_config_joints(
+        joint_names=list(joint_names),
+        spec=spec,
+        verbose=verbose,
+    )

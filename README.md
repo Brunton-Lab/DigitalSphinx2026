@@ -14,55 +14,78 @@ Bingni W. Brunton\*, Elliott T.T. Abe\*, Lawrence Jianqiao Hu, and John C. Tuthi
 ## Abstract
 Animal intelligence is not purely a product of abstract computation in the brain, but emerges from dynamic interactions between the nervous system and the body. New connectome datasets and musculoskeletal models now enable integrated, closed-loop simulations of the neural and biomechanical systems of the fruit fly Drosophila, an ideal model organism to investigate embodied intelligence. However, many biological parameters of the nervous system and the body, as well as how they interface, remain unknown. To fill such gaps, researchers are turning to deep reinforcement learning (DRL), a data-driven optimization framework, to create virtual animals that imitate the behavior of real animals. Here, we provide a cautionary tale about the interpretation of such models. We constructed a virtual chimera of two phylogenetically distant species: a connectome of the C. elegans nematode worm and a biomechanical model of the fly body. The worm connectome receives sensory information from the fly body, and an artificial neural network is trained with DRL to map worm motor neuron activations to the fly’s leg actuators. The resulting digital sphinx produces highly realistic fly walking—yet it is biologically meaningless. This exercise teaches us nothing about either animal and exposes a core peril of connectome-body models: behavioral fidelity is achievable without biological fidelity, making such models easy to overinterpret. Done carefully, virtual animals can be powerful partners to biological experiments, but only if their components and interfaces are grounded in biology.
 
-## Requirements
+## Hardware requirements
 
-- Python >= 3.12
+| Task | Hardware |
+| --- | --- |
+| Training the policy | **NVIDIA GPU with CUDA 12 is required.** Tested on A100 / H100. Single-GPU is sufficient. |
+| Visualization, rollout rendering, notebooks | CPU is sufficient (Linux x86_64 or Apple Silicon macOS). |
+
+Training on macOS is not supported — JAX falls back to CPU and the PPO loop is impractically slow. Use a Linux machine or HPC cluster for training; use any machine for visualization.
+
+Python 3.12 or newer is required.
 
 ## Installation
 
-### Conda / Mamba
+The repo uses a minimal conda environment for Python + system deps (mainly `ffmpeg`), then `uv pip` to install Python packages from [pyproject.toml](pyproject.toml).
 
 ```bash
-# GPU (CUDA 12)
-conda env create -f environment-gpu.yaml
+# 1. Create the bootstrap environment (Python 3.12 + uv + ffmpeg).
+conda env create -f environment.yaml
 conda activate sphinx
 
-# CPU only
-conda env create -f environment-cpu.yaml
-conda activate sphinx-cpu
+# 2. Install the project. Pick the right command for your hardware:
+
+# Linux + NVIDIA GPU (training and viz):
+uv pip install -e ".[gpu]"
+
+# macOS or any CPU-only machine (viz only):
+uv pip install -e .
 ```
 
-### uv 
+Both commands install the notebook and dev tooling (`jupyter`, `ipython`, `pytest`, `black`, `mypy`, `flake8`) as part of the base dependencies, so you can launch `jupyter lab` and run the visualization notebooks immediately. They also pull in [`mujoco_visualizer`](https://github.com/elliottabe/mujoco_visualizer), which powers the rendering, camera presets, and pan animations used by `notebooks/Viz.ipynb`.
+
+To verify the install picked up the right backend:
 
 ```bash
-# CPU only
-uv sync
-
-# GPU (CUDA 12)
-uv sync --extra gpu
-```
-
-### pip
-
-```bash
-# Basic install
-pip install -e .
-
-# With GPU support and dev tools
-pip install -e ".[gpu,dev]"
+python -c "import jax; print(jax.devices())"
+# Expect: [CudaDevice(id=0)] on a GPU machine, [CpuDevice(id=0)] on macOS / CPU.
 ```
 
 ## Quick Start
 
+### Visualize a trained policy (no GPU needed)
+
+Open `notebooks/RL_basic_viz.ipynb` and run all cells. It loads a saved policy
+rollout and renders the fly walking. Set `SPHINX_BASE_DIR` to the directory
+where your training outputs live before launching Jupyter, e.g.:
+
 ```bash
-# Run training with default config
+export SPHINX_BASE_DIR=$HOME/TheSphinx/walk
+jupyter lab notebooks/RL_basic_viz.ipynb
+```
+
+### Train a policy (GPU required)
+
+```bash
+# Default training run.
 python scripts/train_basic_imitation.py
 
-# Override config groups from the command line
-python scripts/train_basic_imitation.py paths=hyak dataset=imitation_walk_anipose_data_v1 seed=42
+# Override config groups from the command line, e.g. to switch to your own
+# paths config (see `configs/paths/`).
+python scripts/train_basic_imitation.py paths=mylaptop dataset=imitation_walk_anipose_data_v1 seed=42
 ```
 
 Training logs to [Weights & Biases](https://wandb.ai) by default.
+
+## HPC submission
+
+The [scripts/](scripts/) directory ships two reference SLURM submission wrappers from the original lab environment:
+
+- `scripts/klone_run.py` — UW Hyak (klone) HPC
+- `scripts/tillicum_run.py` — Tillicum HPC
+
+Both hardcode lab-specific SBATCH directives (account, partition, email address). They are useful as a *starting point* if you want to run training on a SLURM cluster; copy one of them to a new file and adjust the directives for your site.
 
 ## Configuration System
 
@@ -85,7 +108,8 @@ configs/
   dataset/
     imitation_walk_anipose_data_v1.yaml  # Dataset and environment parameters
   paths/
-    default.yaml               # Local workstation paths
+    template.yaml              # Annotated template — copy this for new machines
+    default.yaml               # Original-lab local workstation paths
     hyak.yaml                  # UW Hyak cluster paths
     tillicum.yaml              # Tillicum cluster paths
 ```
@@ -123,13 +147,21 @@ python scripts/train_basic_imitation.py training.train_args.num_envs=2048
 
 ### Path Templates
 
-The `configs/paths/` directory contains environment-specific path configs so the same codebase works across different machines. Each file defines base directories, data paths, and save locations using OmegaConf interpolation:
+The `configs/paths/` directory contains environment-specific path configs so the same codebase works across different machines. Each file defines base directories, data paths, and save locations using OmegaConf interpolation. The `user` field auto-resolves from the `$USER` environment variable, so on a typical machine you only need to update `project_dir`, `base_dir`, and `data_dir`.
 
-- `default.yaml` — local workstation
-- `hyak.yaml` — UW Hyak cluster
-- `tillicum.yaml` — Tillicum cluster
+**Setting up a new machine:**
 
-Switch environments by overriding the `paths` group: `paths=hyak`.
+```bash
+# Copy the template to a name that identifies your machine.
+cp configs/paths/template.yaml configs/paths/mylaptop.yaml
+
+# Edit the three CHANGEME entries in mylaptop.yaml (project_dir, base_dir, data_dir).
+
+# Pass `paths=mylaptop` to any script.
+python scripts/train_basic_imitation.py paths=mylaptop
+```
+
+The shipped configs (`default.yaml`, `hyak.yaml`, `tillicum.yaml`) are reference layouts for the original lab. They are kept in the repo as concrete examples — you do not need to use them.
 
 ## License
 

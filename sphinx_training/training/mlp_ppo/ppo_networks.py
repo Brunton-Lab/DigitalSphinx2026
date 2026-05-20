@@ -271,7 +271,6 @@ def make_decoder_policy_fn(ckpt_path, policy_params, action_size=None):
         return policy
 
     meta_data = OmegaConf.load((ckpt_path / "networks_metadata.yaml").as_posix())
-    # meta_data = OmegaConf.load('/data/users/eabe/biomech_model/Flybody/RL_Flybody/debug/run_id=Testing/ckpt/networks_metadata.yaml')
     observation_size = meta_data['total_obs_size']
     task_obs_size = meta_data['task_obs_size']
     intention_latent_size = meta_data['intention_latent_size']

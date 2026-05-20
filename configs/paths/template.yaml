@@ -1,0 +1,38 @@
+# Template paths configuration for new users / new machines.
+#
+# Copy this file to configs/paths/<your-machine>.yaml (e.g. mylaptop.yaml,
+# mycluster.yaml) and edit the CHANGEME entries. Then run training/viz with:
+#
+#   python scripts/train_basic_imitation.py paths=<your-machine>
+#
+# Tips:
+#   - `user` auto-resolves from the $USER environment variable. Override on
+#     the command line with `paths.user=someone_else` if needed.
+#   - All path subfields below use ${paths.user} and ${paths.project_dir}
+#     interpolation, so usually you only need to edit `project_dir`,
+#     `base_dir`, and `data_dir`. The rest derive automatically.
+#   - Use absolute paths. Relative paths break when Hydra changes the working
+#     directory at runtime.
+
+user: ${oc.env:USER}
+
+# Where you cloned this repository.
+project_dir: "/CHANGEME/path/to/DigitalSphinx2026"
+
+# Where training outputs (checkpoints, logs, figures, videos) go. This
+# typically lives on fast scratch storage, not in the repo.
+base_dir: "/CHANGEME/path/to/scratch/TheSphinx/${version}"
+save_dir: ${multirun_save_dir:${paths.base_dir},${run_id}}
+log_dir:  "${paths.save_dir}/logs/"
+ckpt_dir: "${paths.save_dir}/ckpt/"
+fig_dir:  "${paths.save_dir}/figures/"
+
+# Where reference clip datasets live (HDF5 files referenced by the dataset
+# config). Often on the same scratch volume as base_dir.
+data_dir: "/CHANGEME/path/to/scratch/TheSphinx/data"
+
+# Submodule paths (relative to project_dir; usually no edits needed).
+body_models_dir: "${paths.project_dir}/sphinx_training/fruitfly_body_models"
+
+# Connectome data paths (relative to project_dir; usually no edits needed).
+connectome_data_dir: "${paths.project_dir}/data/connectome/C_elegans"

@@ -1,0 +1,1 @@
+{"action_size": 42, "network_factory_kwargs": {"continue_training": false, "decoder_hidden_layer_sizes": [512, 512], "encoder_hidden_layer_sizes": [512, 512], "intention_latent_size": 16, "task_obs_size": 980, "value_hidden_layer_sizes": [512, 512, 256, 256]}, "network_factory_name": "make_intention_ppo_networks", "normalize_observations": true, "observation_size": 1120}

@@ -1,5 +1,6 @@
-# Unified paths configuration
-user: eabe
+# UW Hyak (klone) HPC paths. Lab-specific reference; copy
+# configs/paths/template.yaml as a starting point for other clusters.
+user: ${oc.env:USER}
 
 # Base directories
 project_dir: "/gscratch/portia/${paths.user}/Research/MyRepos/DigitalSphinx2026"
@@ -11,8 +12,7 @@ fig_dir:  "${paths.save_dir}/figures/"
 data_dir: "/gscratch/portia/${paths.user}/TheSphinx/data"
 
 # Submodule paths (relative to project_dir)
-fly_mimic_dir: "${paths.project_dir}/sphinx_training"
 body_models_dir: "${paths.project_dir}/sphinx_training/fruitfly_body_models"
 
-# vnc_sims data paths
+# Connectome data paths
 connectome_data_dir: "${paths.project_dir}/data/connectome/C_elegans"

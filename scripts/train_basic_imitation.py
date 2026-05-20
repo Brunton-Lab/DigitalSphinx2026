@@ -1,23 +1,28 @@
 import sys
+import platform
 from pathlib import Path
 import os
 import functools
 
-# Set JAX configuration
-os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.85"
-os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
-os.environ["MUJOCO_GL"] = "egl"
-os.environ["PYOPENGL_PLATFORM"] = "egl"
-os.environ["XLA_FLAGS"] = "--xla_gpu_triton_gemm_any=True "
+# Training requires an NVIDIA GPU; macOS is only supported for the
+# visualization notebooks. On Darwin, fall back to osmesa rendering so the
+# script can at least import without crashing on a developer machine.
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # suppress XLA/TF C++ logs
+if platform.system() == "Darwin":
+    os.environ.setdefault("MUJOCO_GL", "osmesa")
+    os.environ.setdefault("PYOPENGL_PLATFORM", "osmesa")
+else:
+    os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.85"
+    os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
+    os.environ["MUJOCO_GL"] = "egl"
+    os.environ["PYOPENGL_PLATFORM"] = "egl"
+    os.environ["XLA_FLAGS"] = "--xla_gpu_triton_gemm_any=True "
 
-# Add fly_neuromechanics to path
+# Make the repo and the sphinx_training package importable when running
+# this script directly (i.e. without `pip install -e .`).
 repo_root = Path(__file__).parent.parent
 sys.path.insert(0, str(repo_root))
-
-# Add sphinx_training to path
-sphinx_training_path = repo_root / 'sphinx_training'
-sys.path.insert(0, str(sphinx_training_path))
+sys.path.insert(0, str(repo_root / "sphinx_training"))
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -35,7 +40,10 @@ jax.config.update("jax_persistent_cache_enable_xla_caches", "xla_gpu_per_fusion_
 import jax.numpy as jnp
 from mujoco_playground import wrapper
 
-num_gpus = jax.device_count(backend="gpu")
+try:
+    num_gpus = jax.device_count(backend="gpu")
+except RuntimeError:
+    num_gpus = 0
 
 
 # Import sphinx_training components
@@ -59,12 +67,12 @@ def make_basic_environment(cfg: DictConfig):
     Create basic imitation environment with direct actuator control.
     
     Args:
-        cfg: Hydra config from fly_neuromechanics
-    
+        cfg: Hydra config
+
     Returns:
         Environment instance and test clips
     """
-    # Load reference clips from fly_mimic data structure
+    # Load reference clips from the HDF5 dataset.
     dataset_path = cfg.paths.data_dir / f"datasets/{cfg.dataset.clip_idx}"
     
     ref_clips = HDF5ReferenceClips(dataset_path)
@@ -90,7 +98,8 @@ def make_basic_environment(cfg: DictConfig):
     env = state_generator_env.LatentStateWrapper(cfg, jax.random.PRNGKey(0), env, state_generator_env.Obs_Adapter())
     env_type = "Imitation (direct actuator control)"
     
-    # Calculate episode length using fly_mimic formula
+    # Episode length excludes the variable start-frame window and the
+    # trailing reference-lookahead window used by the imitation reward.
     episode_length = (
         cfg.dataset.env_args.clip_length 
         - cfg.dataset.env_args.start_frame_range[-1] 
@@ -114,7 +123,7 @@ def make_basic_environment(cfg: DictConfig):
 
 
 def make_network_factory(cfg: DictConfig):
-    """Create PPO network factory with config from fly_neuromechanics."""
+    """Create PPO network factory from the Hydra config."""
     network_type = cfg.training.network.network_type
     
     if network_type == 'intention':

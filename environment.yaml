@@ -1,0 +1,23 @@
+# Minimal conda bootstrap for DigitalSphinx2026.
+#
+# This file only installs Python and a couple of system-level deps that are
+# easier to get from conda than pip (ffmpeg for video encoding). All Python
+# packages are installed in the next step via `uv pip`, driven by pyproject.toml.
+#
+# Usage:
+#   conda env create -f environment.yaml
+#   conda activate sphinx
+#   uv pip install -e ".[gpu]"   # Linux + NVIDIA GPU (training)
+#   uv pip install -e .          # macOS or CPU-only (visualization)
+#
+# Training requires an NVIDIA GPU with CUDA 12. Visualization works on CPU
+# (including Apple Silicon macOS).
+
+name: sphinx
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - uv
+  - ffmpeg
+  - pip

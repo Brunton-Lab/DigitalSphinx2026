@@ -1,0 +1,286 @@
+run_id: 33912115
+version: walk
+seed: 0
+note: hyak_ckpt
+load_jobid: ''
+training:
+  network:
+    network_type: intention
+    init_checkpoint_network_type: intention
+    network_factory_args:
+      encoder_hidden_layer_sizes:
+      - 512
+      - 512
+      decoder_hidden_layer_sizes:
+      - 512
+      - 512
+      value_hidden_layer_sizes:
+      - 512
+      - 512
+      - 256
+      - 256
+      intention_latent_size: 16
+    ckpt_net:
+      encoder_hidden_layer_sizes:
+      - 512
+      - 512
+      decoder_hidden_layer_sizes:
+      - 512
+      - 512
+      value_hidden_layer_sizes:
+      - 512
+      - 512
+      - 256
+      - 256
+      intention_latent_size: 16
+    restore_checkpoint: ${paths.base_dir}/33894258/ckpt/009968025600
+    freeze_decoder: false
+    fine_tune: false
+train_setup:
+  wandb_project: celegans
+  algo_name: ppo
+  num_timesteps: 10000000000
+  eval_every: 50000000
+  reset_every: 25000000
+  mb_per_env: 21.4
+  task_name: ${dataset.env_name}
+train_args:
+  seed: ${seed}
+  num_envs: 4096
+  batch_size: 1024
+  reward_scaling: 1
+  normalize_observations: true
+  action_repeat: 1
+  clipping_epsilon: 0.2
+  unroll_length: 20
+  num_minibatches: 32
+  num_updates_per_batch: 4
+  discounting: 0.95
+  entropy_cost: 0.01
+  learning_rate: 0.0003
+  max_grad_norm: 1.0
+  kl_weight: 0.001
+  mmd_weight: 1.0
+  kl_loss: true
+  mmd_loss: false
+  kl_ramp: 1.25
+  kl_ramp_cycles: 3
+  warmup_steps: 0
+  use_kl_schedule: false
+  use_mmd_schedule: false
+  ar1_weight: 0.0
+  use_ar1_schedule: false
+load_checkpoint: ''
+restore_checkpoint: ''
+dataset:
+  env_args:
+    mjcf_path: ${paths.body_models_dir}/fruitfly_v1/fruitfly_v1.xml
+    arena_path: ${paths.body_models_dir}/fruitfly_v1/floor.xml
+    end_eff_names:
+    - claw_T1_left
+    - claw_T1_right
+    - claw_T2_left
+    - claw_T2_right
+    - claw_T3_left
+    - claw_T3_right
+    body_names:
+    - coxa_T1_left
+    - trochanter_T1_left
+    - femur_T1_left
+    - tibia_T1_left
+    - tarsus_T1_left
+    - tarsus2_T1_left
+    - tarsus3_T1_left
+    - tarsus4_T1_left
+    - claw_T1_left
+    - coxa_T1_right
+    - femur_T1_right
+    - tibia_T1_right
+    - tarsus_T1_right
+    - tarsus2_T1_right
+    - tarsus3_T1_right
+    - tarsus4_T1_right
+    - claw_T1_right
+    - coxa_T2_left
+    - femur_T2_left
+    - tibia_T2_left
+    - tarsus_T2_left
+    - tarsus2_T2_left
+    - tarsus3_T2_left
+    - tarsus4_T2_left
+    - claw_T2_left
+    - coxa_T2_right
+    - femur_T2_right
+    - tibia_T2_right
+    - tarsus_T2_right
+    - tarsus2_T2_right
+    - tarsus3_T2_right
+    - tarsus4_T2_right
+    - claw_T2_right
+    - coxa_T3_left
+    - femur_T3_left
+    - tibia_T3_left
+    - tarsus_T3_left
+    - tarsus2_T3_left
+    - tarsus3_T3_left
+    - tarsus4_T3_left
+    - claw_T3_left
+    - coxa_T3_right
+    - femur_T3_right
+    - tibia_T3_right
+    - tarsus_T3_right
+    - tarsus2_T3_right
+    - tarsus3_T3_right
+    - tarsus4_T3_right
+    - claw_T3_right
+    joint_names:
+    - coxa_abduct_T1_left
+    - coxa_twist_T1_left
+    - coxa_T1_left
+    - femur_twist_T1_left
+    - femur_T1_left
+    - tibia_T1_left
+    - tarsus_T1_left
+    - coxa_abduct_T1_right
+    - coxa_twist_T1_right
+    - coxa_T1_right
+    - femur_twist_T1_right
+    - femur_T1_right
+    - tibia_T1_right
+    - tarsus_T1_right
+    - coxa_abduct_T2_left
+    - coxa_twist_T2_left
+    - coxa_T2_left
+    - femur_twist_T2_left
+    - femur_T2_left
+    - tibia_T2_left
+    - tarsus_T2_left
+    - coxa_abduct_T2_right
+    - coxa_twist_T2_right
+    - coxa_T2_right
+    - femur_twist_T2_right
+    - femur_T2_right
+    - tibia_T2_right
+    - tarsus_T2_right
+    - coxa_abduct_T3_left
+    - coxa_twist_T3_left
+    - coxa_T3_left
+    - femur_twist_T3_left
+    - femur_T3_left
+    - tibia_T3_left
+    - tarsus_T3_left
+    - coxa_abduct_T3_right
+    - coxa_twist_T3_right
+    - coxa_T3_right
+    - femur_twist_T3_right
+    - femur_T3_right
+    - tibia_T3_right
+    - tarsus_T3_right
+    wing_names:
+    - wing_yaw_left
+    - wing_roll_left
+    - wing_pitch_left
+    - wing_yaw_right
+    - wing_roll_right
+    - wing_pitch_right
+    clip_length: 1001
+    start_frame_range:
+    - 0
+    - 50
+    mujoco_impl: null
+    floor_height: -0.125
+    enable_flight: false
+    quasi_aero: true
+    physics_timestep: 0.0002
+    solver: cg
+    iterations: 4
+    ls_iterations: 4
+    noslip_iterations: 3
+    nconmax: 256
+    njmax: 512
+    torque_actuators: true
+    filter_joints: true
+    physics_steps_per_control_step: 5
+    mocap_hz: 500
+    test_ratio: 0.4
+    reward_terms:
+      root_pos:
+        weight: 1.0
+        exp_scale: 400.0
+      root_quat:
+        weight: 1.0
+        exp_scale: 4.0
+      root_ang_vel:
+        weight: 0.5
+        exp_scale: 0.075
+      joints:
+        weight: 1.0
+        exp_scale: 0.25
+      joints_vel:
+        weight: 0.5
+        exp_scale: 0.001
+      bodies_pos:
+        weight: 0.5
+        exp_scale: 8.0
+      end_eff:
+        weight: 1.0
+        exp_scale: 100.0
+      thorax_z_range:
+        weight: 0.5
+        healthy_z_range:
+        - -0.03
+        - 0.1
+      last_frame_reward:
+        weight: 10.0
+      control_cost:
+        weight: 0.02
+      control_diff_cost:
+        weight: 0.5
+      energy_cost:
+        max_value: 50.0
+        weight: 0.001
+    termination_criteria:
+      root_too_far:
+        max_distance: 0.01
+      root_too_rotated:
+        max_degrees: 0.075
+      pose_error:
+        max_l2_error: 5.0
+      thorax_z_range:
+        enable_flight: false
+        healthy_z_range:
+        - -0.03
+        - 0.04
+      nan_state:
+        unused: true
+    reset_noise_scale: 0.001
+    ref_len: 5
+    partial_ref_traj: false
+    mask_prob: 0.2
+    retract_wings: true
+    qvel_init: noise
+  name: fly_imitation
+  env_name: fly_imitation_walk
+  version: walk
+  camera: 1
+  clip_idx: FruitflyV1_walk_500hz_avg.h5
+  train: true
+connectome:
+  rnn_weights: ${paths.connectome_data_dir}/W_hh_123025.npy
+  motor_neuron_indices: ${paths.connectome_data_dir}/motor_head_motor_command_neuron_indices.txt
+  sensory_neuron_indices: ${paths.connectome_data_dir}/sensory_neuron_indices.txt
+  sensory_nonlinearity: tanh
+  norm_eigen_target: 0.95
+  rec_nonlinearity: tanh
+paths:
+  user: eabe
+  project_dir: /gscratch/portia/eabe/Research/MyRepos/DigitalSphinx2026
+  base_dir: /gscratch/portia/eabe/TheSphinx/walk
+  save_dir: /gscratch/portia/eabe/TheSphinx/walk/33912115
+  log_dir: /gscratch/portia/eabe/TheSphinx/walk/33912115/logs
+  ckpt_dir: /gscratch/portia/eabe/TheSphinx/walk/33912115/ckpt
+  fig_dir: /gscratch/portia/eabe/TheSphinx/walk/33912115/figures
+  data_dir: /gscratch/portia/eabe/TheSphinx/data
+  fly_mimic_dir: /gscratch/portia/eabe/Research/MyRepos/DigitalSphinx2026/sphinx_training
+  body_models_dir: /gscratch/portia/eabe/Research/MyRepos/DigitalSphinx2026/sphinx_training/fruitfly_body_models
+  connectome_data_dir: /gscratch/portia/eabe/Research/MyRepos/DigitalSphinx2026/data/connectome/C_elegans

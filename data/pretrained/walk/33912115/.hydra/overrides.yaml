@@ -1,0 +1,8 @@
+- paths=hyak
+- note=hyak_ckpt
+- training=ppo_basic_imitation_low_kl
+- dataset=imitation_walk_anipose_data_v1
+- load_jobid=
+- run_id=33912115
+- training/network=intention_ws
+- train_args.num_envs=4096

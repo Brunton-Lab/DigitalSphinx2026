@@ -57,6 +57,7 @@ dependencies = [
     "imageio[ffmpeg]",
     "opencv-python",
     "pillow",
+    "mujoco_visualizer[io,jupyter] @ git+https://github.com/elliottabe/mujoco_visualizer.git",
 
     # Logging & monitoring
     "wandb[media]",
@@ -69,13 +70,8 @@ dependencies = [
     "absl-py",
     "etils",
     "natsort",
-]
 
-[project.optional-dependencies]
-gpu = [
-    "jax[cuda12]>=0.4.0",
-]
-dev = [
+    # Dev / notebook tooling (installed by default so notebooks just work).
     "pytest>=7.0",
     "pytest-cov",
     "black>=23.0",
@@ -83,6 +79,11 @@ dev = [
     "flake8>=6.0",
     "ipython",
     "jupyter",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "jax[cuda12]>=0.4.0",
 ]
 
 [project.urls]

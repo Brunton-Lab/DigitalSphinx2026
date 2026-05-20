@@ -209,3 +209,4 @@ __marimo__/
 *.code-workspace
 tmp/
 OutFiles/
+.claude/

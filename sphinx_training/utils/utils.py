@@ -509,9 +509,8 @@ def load_reference_clip_for_estimation(cfg):
         reference_clip: Loaded reference clip data
     """
     try:
-        # Import required modules
-        import fly_mimic.utils.io_dict_to_hdf5 as ioh5
-        from fly_mimic.utils.data_utils import ReferenceClips
+        import sphinx_training.utils.io_dict_to_hdf5 as ioh5
+        from sphinx_training.utils.data_utils import ReferenceClips
         import jax.numpy as jnp
         
         env_cfg = cfg.dataset
