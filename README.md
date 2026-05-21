@@ -163,6 +163,10 @@ python scripts/train_basic_imitation.py paths=mylaptop
 
 The shipped configs (`default.yaml`, `hyak.yaml`, `tillicum.yaml`) are reference layouts for the original lab. They are kept in the repo as concrete examples — you do not need to use them.
 
+# Data
+Dataset and example rollout can be found here:  
+DOI: [10.5061/dryad.qjq2bvqwz](https://doi.org/10.5061/dryad.qjq2bvqwz)
+
 ## License
 
 GPL
