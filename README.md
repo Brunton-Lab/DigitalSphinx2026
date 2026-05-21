@@ -27,7 +27,7 @@ Python 3.12 or newer is required.
 
 ## Installation
 
-The repo uses a minimal conda environment for Python + system deps (mainly `ffmpeg`), then `uv pip` to install Python packages from [pyproject.toml](pyproject.toml).
+The repo uses a minimal conda environment for Python + system deps (mainly `ffmpeg`), then `uv sync` to install pinned Python packages from [uv.lock](uv.lock) (resolved from [pyproject.toml](pyproject.toml)).
 
 ```bash
 # 1. Create the bootstrap environment (Python 3.12 + uv + ffmpeg).
@@ -37,11 +37,13 @@ conda activate sphinx
 # 2. Install the project. Pick the right command for your hardware:
 
 # Linux + NVIDIA GPU (training and viz):
-uv pip install -e ".[gpu]"
+uv sync --extra gpu
 
 # macOS or any CPU-only machine (viz only):
-uv pip install -e .
+uv sync
 ```
+
+`uv sync` installs the exact versions captured in `uv.lock`, which is what we used to produce the paper results. If your cluster's CUDA stack clashes with the pinned `jax[cuda12]` version, you can fall back to an unpinned install with `uv pip install -e ".[gpu]"` instead.
 
 Both commands install the notebook and dev tooling (`jupyter`, `ipython`, `pytest`, `black`, `mypy`, `flake8`) as part of the base dependencies, so you can launch `jupyter lab` and run the visualization notebooks immediately. They also pull in [`mujoco_visualizer`](https://github.com/elliottabe/mujoco_visualizer), which powers the rendering, camera presets, and pan animations used by `notebooks/Viz.ipynb`.
 
