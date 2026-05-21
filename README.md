@@ -56,14 +56,35 @@ python -c "import jax; print(jax.devices())"
 
 ### Visualize a trained policy (no GPU needed)
 
-Open `notebooks/RL_basic_viz.ipynb` and run all cells. It loads a saved policy
-rollout and renders the fly walking. Set `SPHINX_BASE_DIR` to the directory
-where your training outputs live before launching Jupyter, e.g.:
+Download the dataset bundle from Dryad ([10.5061/dryad.qjq2bvqwz](https://doi.org/10.5061/dryad.qjq2bvqwz)) and unpack it so the repo looks like this:
 
-```bash
-export SPHINX_BASE_DIR=$HOME/TheSphinx/walk
-jupyter lab notebooks/RL_basic_viz.ipynb
 ```
+DigitalSphinx2026/
+├── configs/paths/template.yaml          # edit project_dir, base_dir, data_dir (see below)
+└── data/
+    ├── datasets/
+    │   └── FruitflyV1_walk_500hz_avg.h5 # reference clip HDF5 from Dryad
+    ├── pretrained/walk/33912115/        # example rollout from Dryad
+    │   ├── ckpt/<step>/…
+    │   └── logs/run_config.yaml
+    └── connectome/C_elegans/…           # already shipped in the repo
+```
+
+Then edit the `CHANGEME` line in [configs/paths/template.yaml](configs/paths/template.yaml) so `project_dir` points at your clone:
+
+```yaml
+project_dir: "/absolute/path/to/DigitalSphinx2026"
+```
+
+`base_dir` and `data_dir` are already wired to the in-repo `data/pretrained/${version}/` and `data/` directories, so no further edits are needed for the visualization notebook.
+
+With these values the notebook resolves:
+- checkpoints from `${base_dir}/<run_id>/ckpt/` → `data/pretrained/walk/33912115/ckpt/`
+- reference clips from `${data_dir}/datasets/${cfg.dataset.clip_idx}` → `data/datasets/FruitflyV1_walk_500hz_avg.h5`
+
+If you prefer to keep the data on a scratch volume instead, set `base_dir` and `data_dir` to point there and mirror the same `<run_id>/ckpt/…` and `datasets/…` substructure. You can also override the rollout search root at runtime by exporting `SPHINX_BASE_DIR=<base_dir>` before launching Jupyter.
+
+Open `notebooks/RL_basic_viz.ipynb` and run all cells.
 
 ### Train a policy (GPU required)
 
