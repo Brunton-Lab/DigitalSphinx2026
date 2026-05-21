@@ -34,13 +34,15 @@ The repo uses a minimal conda environment for Python + system deps (mainly `ffmp
 conda env create -f environment.yaml
 conda activate sphinx
 
-# 2. Install the project. Pick the right command for your hardware:
+# 2. Install the project. Pick the right command for your hardware.
+#    Note the `--active` flag — without it `uv sync` ignores the active conda
+#    env and installs into a project-local `.venv/` instead.
 
 # Linux + NVIDIA GPU (training and viz):
-uv sync --extra gpu
+uv sync --active --extra gpu
 
 # macOS or any CPU-only machine (viz only):
-uv sync
+uv sync --active
 ```
 
 `uv sync` installs the exact versions captured in `uv.lock`, which is what we used to produce the paper results. If your cluster's CUDA stack clashes with the pinned `jax[cuda12]` version, you can fall back to an unpinned install with `uv pip install -e ".[gpu]"` instead.
