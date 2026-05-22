@@ -4,12 +4,12 @@ user: ${oc.env:USER}
 
 # Base directories
 project_dir: "/gscratch/portia/${paths.user}/Research/MyRepos/DigitalSphinx2026"
-base_dir: "/gscratch/portia/${paths.user}/TheSphinx/${version}"
+base_dir: "/gscratch/portia/${paths.user}/DigitalSphinx2026/${version}"
 save_dir: ${multirun_save_dir:${paths.base_dir},${run_id}}
 log_dir:  "${paths.save_dir}/logs/"
 ckpt_dir: "${paths.save_dir}/ckpt/"
 fig_dir:  "${paths.save_dir}/figures/"
-data_dir: "/gscratch/portia/${paths.user}/TheSphinx/data"
+data_dir: "/gscratch/portia/${paths.user}/DigitalSphinx2026/data"
 
 # Submodule paths (relative to project_dir)
 body_models_dir: "${paths.project_dir}/sphinx_training/fruitfly_body_models"

@@ -90,8 +90,8 @@ python -u ./scripts/{script_name}.py paths={paths} note={note} training={trainin
 def main():
     # Set up argument parsing
     parser = argparse.ArgumentParser(description='Submit a SLURM job with specified GPU type.')
-    parser.add_argument('--conda_env_name', type=str, default='fly_neuromech',
-                        help='Name of the conda environment (default: fly_neuromech)')
+    parser.add_argument('--conda_env_name', type=str, default='sphinx',
+                        help='Name of the conda environment (default: sphinx)')
     parser.add_argument('--script_name', type=str, default='train_basic_imitation',
                         help='Name of the script to run (default: train_basic_imitation)')
     parser.add_argument('--num_gpus', type=int, default=8,

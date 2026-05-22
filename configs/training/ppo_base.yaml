@@ -7,7 +7,7 @@ defaults:
 
 # Training metadata
 train_setup:
-  wandb_project: "fly_neuromechanics"
+  wandb_project: "celegans"
   algo_name: ppo
   num_timesteps: 10_000_000_000
   eval_every: 50_000_000
